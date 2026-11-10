@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة المشرف — TIMSS 2027</title>
+<style>
+/* ===== الأنماط الأساسية ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', 'Tahoma', sans-serif;
+  background: linear-gradient(135deg, #1a3a5c, #2c5f8a, #1e4d73);
+  min-height: 100vh; color: #333; padding: 20px;
+}
+.hidden { display: none !important; }
+
+.container {
+  max-width: 1400px; margin: 0 auto; background: #fff;
+  border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  overflow: hidden; animation: fadeIn .4s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity:1; transform:none;} }
+
+/* ===== الرأس ===== */
+.header {
+  background: linear-gradient(135deg, #1a3a5c, #2c5f8a);
+  color: #fff; padding: 20px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+.header-info h1 { font-size: 22px; margin-bottom: 4px; }
+.header-info p { font-size: 13px; opacity: .85; }
+.header-user { display: flex; align-items: center; gap: 20px; }
+.user-badge {
+  background: rgba(255,255,255,.15); padding: 8px 16px;
+  border-radius: 12px; font-size: 14px; font-weight: 700;
+  border: 1px solid rgba(255,255,255,.2);
+}
+.header-actions { display: flex; gap: 8px; }
+
+/* ===== التبويبات ===== */
+.tabs {
+  display: flex; background: #f0f4f8; border-bottom: 2px solid #d8e2ec;
+  overflow-x: auto;
+}
+.tab {
+  padding: 15px 25px; background: none; border: none;
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  color: #6b7c8f; cursor: pointer; border-bottom: 3px solid transparent;
+  transition: all .2s; white-space: nowrap;
+}
+.tab:hover { color: #2c5f8a; background: #e8eef4; }
+.tab.active { color: #1a3a5c; border-bottom-color: #2c5f8a; background: #fff; }
+
+/* ===== المحتوى ===== */
+.content { padding: 24px; }
+.tab-panel { display: none; animation: fadeIn .3s ease; }
+.tab-panel.active { display: block; }
+
+/* ===== البطاقات والإحصائيات ===== */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px; margin-bottom: 24px;
+}
+.stat-card {
+  background: #fff; border: 2px solid #d8e2ec; border-radius: 16px;
+  padding: 20px; text-align: center; transition: transform .2s;
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,.05); }
+.stat-card .val { font-size: 32px; font-weight: 800; color: #1a3a5c; margin-bottom: 5px; }
+.stat-card .lbl { font-size: 14px; color: #6b7c8f; font-weight: 600; }
+.stat-card.green .val { color: #1e7e34; }
+.stat-card.red .val { color: #c0392b; }
+.stat-card.gold .val { color: #b8860b; }
+
+/* ===== الأزرار ===== */
+.btn {
+  padding: 10px 20px; border-radius: 10px; border: none;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .2s; display: inline-flex;
+  align-items: center; justify-content: center; gap: 8px;
+}
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(135deg, #1a3a5c, #2c5f8a); color: #fff; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26,58,92,.35); }
+.btn-light { background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.3); }
+.btn-light:hover { background: rgba(255,255,255,.3); }
+.btn-success { background: #1e7e34; color: #fff; }
+.btn-success:hover:not(:disabled) { background: #16652a; }
+.btn-danger { background: #c0392b; color: #fff; }
+.btn-danger:hover:not(:disabled) { background: #a93226; }
+.btn-secondary { background: #eef2f6; color: #2c5f8a; }
+.btn-secondary:hover:not(:disabled) { background: #d8e2ec; }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+
+/* ===== الجداول ===== */
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
+.toolbar input, .toolbar select { padding: 10px 14px; border: 2px solid #d8e2ec; border-radius: 10px; font-family: inherit; font-size: 14px; }
+.toolbar input:focus, .toolbar select:focus { outline: none; border-color: #2c5f8a; }
+.toolbar .spacer { flex: 1; }
+
+.table-wrap {
+  background: #fff; border: 1px solid #e4ecf3; border-radius: 12px;
+  overflow: auto; max-height: 600px;
+}
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th {
+  background: #f0f4f8; color: #1a3a5c; font-weight: 700;
+  padding: 14px 12px; text-align: right; border-bottom: 2px solid #d8e2ec;
+  position: sticky; top: 0; z-index: 2;
+}
+tbody td { padding: 12px; border-bottom: 1px solid #eef2f6; vertical-align: middle; }
+tbody tr:hover { background: #f8fbfd; }
+.empty-row td { text-align: center; padding: 40px; color: #6b7c8f; }
+
+/* ===== المودال ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,30,50,.65);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal {
+  background: #fff; border-radius: 16px; padding: 24px;
+  max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.modal h2 { color: #1a3a5c; margin-bottom: 20px; border-bottom: 2px solid #eef2f6; padding-bottom: 10px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 700; color: #4a5c6e; margin-bottom: 6px; }
+.form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #d8e2ec; border-radius: 10px; font-family: inherit; font-size: 14px; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #2c5f8a; }
+.form-group input:disabled { background: #f0f4f8; cursor: not-allowed; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; border-top: 1px solid #eef2f6; padding-top: 16px; }
+
+/* ===== الإشعارات ===== */
+.toast-container {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 3000; display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  background: #333; color: #fff; padding: 12px 24px;
+  border-radius: 10px; font-size: 14px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3); animation: toastIn .3s ease;
+}
+.toast.success { background: #1e7e34; }
+.toast.error { background: #c0392b; }
+.toast.warning { background: #b8860b; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-20px);} to { opacity:1; transform:none;} }
+
+.loading {
+  position: fixed; inset: 0; background: rgba(15,30,50,.85);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; z-index: 5000; color: #fff;
+}
+.spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- شاشة التحميل -->
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <p style="margin-top: 15px;">جاري تحميل البيانات...</p>
+</div>
+
+<!-- الحاوية الرئيسية -->
+<div class="container hidden" id="mainContainer">
+  <header class="header">
+    <div class="header-info">
+      <h1>👨‍💼 بوابة المشرف</h1>
+      <p>منصة TIMSS 2027 — الإشراف التربوي</p>
+    </div>
+    <div class="header-user">
+      <div class="user-badge" id="supInfo">—</div>
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="location.href='report.html'">📊 التقارير</button>
+        <button class="btn btn-light" data-logout>🚪 خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="schools">🏫 المدارس</button>
+    <button class="tab" data-tab="teachers">👨‍🏫 المعلمون</button>
+    <button class="tab" data-tab="questions">📚 الأسئلة</button>
+  </nav>
+
+  <main class="content">
+    
+    <!-- 1. تبويب المدارس -->
+    <section class="tab-panel active" id="tab-schools">
+      <div class="toolbar">
+        <input type="text" id="schoolSearch" placeholder="🔍 بحث بالاسم أو الرقم..." style="min-width:250px;">
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openSchoolModal()">➕ إضافة مدرسة</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>الرقم الوطني</th><th>اسم المدرسة</th><th>المديرية</th><th>الجنس</th><th>النوع</th><th>إجراءات</th></tr>
+          </thead>
+          <tbody id="schoolsBody"><tr class="empty-row"><td colspan="6">جاري التحميل...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2. تبويب المعلمين -->
+    <section class="tab-panel" id="tab-teachers">
+      <div class="toolbar">
+        <input type="text" id="teacherSearch" placeholder="🔍 بحث بالاسم أو الرقم..." style="min-width:250px;">
+        <select id="schoolFilter"><option value="">كل المدارس</option></select>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openTeacherModal()">➕ إضافة معلم</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>الرقم الوطني</th><th>الاسم الكامل</th><th>المدرسة</th><th>التخصص</th><th>صلاحية الأسئلة</th><th>إجراءات</th></tr>
+          </thead>
+          <tbody id="teachersBody"><tr class="empty-row"><td colspan="6">جاري التحميل...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. تبويب الأسئلة -->
+    <section class="tab-panel" id="tab-questions">
+      <div class="stats-grid" id="questionStats"></div>
+      <div class="card" style="text-align: center; padding: 40px;">
+        <h2 style="color: #1a3a5c; margin-bottom: 15px;">بنك الأسئلة المركزي</h2>
+        <p style="color: #6b7c8f; margin-bottom: 20px;">يمكنك إدارة جميع أسئلة المنصة (إضافة، تعديل، معاينة) من خلال مدير الأسئلة.</p>
+        <button class="btn btn-primary" onclick="location.href='questions-manager.html'" style="padding: 15px 30px; font-size: 16px;">
+          🚀 فتح مدير الأسئلة
+        </button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== مودال المدرسة ===== -->
+<div class="modal-overlay hidden" id="schoolModal">
+  <div class="modal">
+    <h2 id="schoolModalTitle">🏫 إضافة مدرسة</h2>
+    <form id="schoolForm" onsubmit="event.preventDefault();">
+      <div class="form-group">
+        <label>الرقم الوطني للمدرسة *</label>
+        <input type="number" id="schNationalCode" required>
+      </div>
+      <div class="form-group">
+        <label>اسم المدرسة *</label>
+        <input type="text" id="schName" required>
+      </div>
+      <div class="form-group">
+        <label>الجنس</label>
+        <select id="schGender">
+          <option value="بنين">بنين</option>
+          <option value="بنات">بنات</option>
+          <option value="مختلط">مختلط</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>نوع المدرسة</label>
+        <select id="schType">
+          <option value="حكومي">حكومي</option>
+          <option value="خاص">خاص</option>
+          <option value="وكالة">وكالة</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('schoolModal')">إلغاء</button>
+        <button type="submit" class="btn btn-primary" id="btnSaveSchool">💾 حفظ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== مودال المعلم ===== -->
+<div class="modal-overlay hidden" id="teacherModal">
+  <div class="modal">
+    <h2 id="teacherModalTitle">👨‍🏫 إضافة معلم</h2>
+    <form id="teacherForm" onsubmit="event.preventDefault();">
+      <div class="form-group">
+        <label>الرقم الوطني *</label>
+        <input type="text" id="tchNationalId" required maxlength="15">
+      </div>
+      <div class="form-group">
+        <label>الاسم الكامل *</label>
+        <input type="text" id="tchName" required>
+      </div>
+      <div class="form-group">
+        <label>المدرسة *</label>
+        <select id="tchSchool" required></select>
+      </div>
+      <div class="form-group">
+        <label>التخصص *</label>
+        <select id="tchSubject" required>
+          <option value="رياضيات">رياضيات</option>
+          <option value="علوم">علوم</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="tchPhone" maxlength="15">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('teacherModal')">إلغاء</button>
+        <button type="submit" class="btn btn-primary" id="btnSaveTeacher">💾 حفظ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- السكربتات -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+
+<script>
+// ==========================================
+// 1. الإعدادات الأساسية
+// ==========================================
+const DB = window.supabaseClient;
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function toast(msg, type = 'info', ms = 3000) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  $('#toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, ms);
+}
+
+function closeModal(id) { $('#' + id).classList.add('hidden'); }
+
+// ==========================================
+// 2. الحالة العامة
+// ==========================================
+const state = {
+  session: null,
+  supervisor: null,
+  schools: [],
+  teachers: [],
+  editingSchool: null,
+  editingTeacher: null
+};
+
+// ==========================================
+// 3. التهيئة (إصلاح الحلقة المفرغة)
+// ==========================================
+async function init() {
+  try {
+    if (!DB) throw new Error('فشل الاتصال بقاعدة البيانات.');
+
+    // التحقق من الجلسة
+    const session = auth.getSession();
+    
+    // ⚠️ الإصلاح: إذا كانت الجلسة غير موجودة أو ليست مشرف، نمسحها فوراً لتجنب الحلقة المفرغة
+    if (!session || session.role !== 'supervisor') { 
+      sessionStorage.removeItem('timss_session'); 
+      location.href = 'index.html'; 
+      return; 
+    }
+    
+    state.session = session;
+
+    // جلب بيانات المشرف
+    const { data: sup, error: sErr } = await DB.from('supervisors').select('*, directorates(directorate_name)').eq('national_id', session.national_id).maybeSingle();
+    if (sErr) throw sErr;
+    
+    state.supervisor = sup;
+    $('#supInfo').innerHTML = `${esc(sup.full_name)} <span style="font-size:12px; opacity:0.8;">(${esc(sup.directorates?.directorate_name || '')})</span>`;
+
+    // جلب البيانات بالتوازي
+    await Promise.all([
+      loadSchools(),
+      loadTeachers()
+    ]);
+
+    renderSchools();
+    renderTeachers();
+    renderQuestionsStats();
+
+    $('#loading').classList.add('hidden');
+    $('#mainContainer').classList.remove('hidden');
+
+  } catch (err) {
+    console.error(err);
+    $('#loading').innerHTML = `
+      <div style="text-align: center; padding: 20px; color: #fff;">
+        <h2 style="color: #ef4444; margin-bottom: 15px;">⚠️ خطأ في التحميل</h2>
+        <p style="font-size: 16px;">${esc(err.message)}</p>
+        <button onclick="sessionStorage.removeItem('timss_session'); location.href='index.html'" style="margin-top: 20px; padding: 10px 20px; border: none; border-radius: 8px; background: #3b82f6; color: #fff; cursor: pointer; font-size: 16px;">العودة للدخول</button>
+      </div>
+    `;
+  }
+}
+
+// ==========================================
+// 4. جلب البيانات
+// ==========================================
+async function loadSchools() {
+  let q = DB.from('schools').select('*, directorates(directorate_name)').order('school_name');
+  
+  // إذا كان المشرف تابعاً لمديرية معينة، نجلب مدارس مديريته فقط
+  if (state.supervisor && state.supervisor.directorate_id) {
+    q = q.eq('directorate_id', state.supervisor.directorate_id);
+  }
+  
+  const { data, error } = await q;
+  if (error) throw new Error('فشل في جلب المدارس: ' + error.message);
+  state.schools = data || [];
+  
+  // تحديث فلتر المدارس في صفحة المعلمين
+  const filter = $('#schoolFilter');
+  filter.innerHTML = '<option value="">كل المدارس</option>' + 
+    state.schools.map(s => `<option value="${s.national_code}">${esc(s.school_name)}</option>`).join('');
+    
+  // تحديث قائمة المدارس في مودال المعلم
+  const tchSchool = $('#tchSchool');
+  tchSchool.innerHTML = '<option value="">-- اختر المدرسة --</option>' + 
+    state.schools.map(s => `<option value="${s.national_code}">${esc(s.school_name)}</option>`).join('');
+}
+
+async function loadTeachers() {
+  const { data, error } = await DB.from('teachers').select('*, schools(school_name)').order('full_name');
+  if (error) throw new Error('فشل في جلب المعلمين: ' + error.message);
+  
+  // تصفية المعلمين ليكونوا فقط في مدارس المشرف
+  const mySchoolIds = state.schools.map(s => s.national_code);
+  state.teachers = (data || []).filter(t => mySchoolIds.includes(t.school_id));
+}
+
+// ==========================================
+// 5. عرض المدارس
+// ==========================================
+function renderSchools() {
+  const q = ($('#schoolSearch').value || '').toLowerCase();
+  const rows = state.schools.filter(s => 
+    (s.school_name || '').toLowerCase().includes(q) || String(s.national_code).includes(q)
+  );
+
+  const body = $('#schoolsBody');
+  if (!rows.length) { body.innerHTML = '<tr class="empty-row"><td colspan="6">لا توجد مدارس مطابقة</td></tr>'; return; }
+  
+  body.innerHTML = rows.map(s => `
+    <tr>
+      <td>${s.national_code}</td>
+      <td><b>${esc(s.school_name)}</b></td>
+      <td>${esc(s.directorates?.directorate_name || '—')}</td>
+      <td>${esc(s.gender || '—')}</td>
+      <td>${esc(s.school_type || '—')}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="openSchoolModal(${s.national_code})">✏️ تعديل</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openSchoolModal(code = null) {
+  const form = $('#schoolForm');
+  form.reset();
+  if (code) {
+    const s = state.schools.find(x => x.national_code === code);
+    if (!s) return;
+    state.editingSchool = s;
+    $('#schoolModalTitle').textContent = '✏️ تعديل مدرسة';
+    $('#schNationalCode').value = s.national_code;
+    $('#schNationalCode').disabled = true;
+    $('#schName').value = s.school_name;
+    $('#schGender').value = s.gender || 'بنين';
+    $('#schType').value = s.school_type || 'حكومي';
+  } else {
+    state.editingSchool = null;
+    $('#schoolModalTitle').textContent = '🏫 إضافة مدرسة';
+    $('#schNationalCode').disabled = false;
+  }
+  $('#schoolModal').classList.remove('hidden');
+}
+
+$('#schoolForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const payload = {
+    national_code: Number($('#schNationalCode').value),
+    school_name: $('#schName').value.trim(),
+    directorate_id: state.supervisor.directorate_id, // يُربط تلقائياً بمديرية المشرف
+    gender: $('#schGender').value,
+    school_type: $('#schType').value
+  };
+
+  $('#btnSaveSchool').disabled = true;
+  try {
+    if (state.editingSchool) {
+      const { error } = await DB.from('schools').update(payload).eq('national_code', state.editingSchool.national_code);
+      if (error) throw error;
+      toast('✅ تم تحديث المدرسة', 'success');
+    } else {
+      const { error } = await DB.from('schools').insert(payload);
+      if (error) throw error;
+      toast('✅ تمت إضافة المدرسة', 'success');
+    }
+    closeModal('schoolModal');
+    await loadSchools();
+    renderSchools();
+  } catch (err) {
+    toast('فشل الحفظ: ' + err.message, 'error');
+  } finally {
+    $('#btnSaveSchool').disabled = false;
+  }
+});
+
+// ==========================================
+// 6. عرض المعلمين
+// ==========================================
+function renderTeachers() {
+  const q = ($('#teacherSearch').value || '').toLowerCase();
+  const sf = $('#schoolFilter').value;
+  
+  const rows = state.teachers.filter(t => 
+    (!q || (t.full_name || '').toLowerCase().includes(q) || String(t.national_id).includes(q)) &&
+    (!sf || t.school_id == sf)
+  );
+
+  const body = $('#teachersBody');
+  if (!rows.length) { body.innerHTML = '<tr class="empty-row"><td colspan="6">لا توجد نتائج</td></tr>'; return; }
+
+  body.innerHTML = rows.map(t => `
+    <tr>
+      <td>${esc(t.national_id)}</td>
+      <td><b>${esc(t.full_name)}</b></td>
+      <td>${esc(t.schools?.school_name || '—')}</td>
+      <td>${esc(t.subject || '—')}</td>
+      <td>
+        ${t.can_add_questions 
+          ? '<span style="color:#1e7e34; font-weight:bold;">✅ مصرّح</span>' 
+          : '<span style="color:#c0392b; font-weight:bold;">⛔ غير مصرّح</span>'}
+      </td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="openTeacherModal('${esc(t.national_id)}')">✏️ تعديل</button>
+        <button class="btn btn-sm ${t.can_add_questions ? 'btn-danger' : 'btn-success'}" 
+          onclick="togglePermission('${esc(t.national_id)}', ${t.can_add_questions})">
+          ${t.can_add_questions ? '⛔ سحب' : '✅ منح'}
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openTeacherModal(id = null) {
+  const form = $('#teacherForm');
+  form.reset();
+  if (id) {
+    const t = state.teachers.find(x => x.national_id === id);
+    if (!t) return;
+    state.editingTeacher = t;
+    $('#teacherModalTitle').textContent = '✏️ تعديل معلم';
+    $('#tchNationalId').value = t.national_id;
+    $('#tchNationalId').disabled = true;
+    $('#tchName').value = t.full_name;
+    $('#tchSchool').value = t.school_id || '';
+    $('#tchSubject').value = t.subject || 'رياضيات';
+    $('#tchPhone').value = t.phone || '';
+  } else {
+    state.editingTeacher = null;
+    $('#teacherModalTitle').textContent = '👨‍🏫 إضافة معلم';
+    $('#tchNationalId').disabled = false;
+  }
+  $('#teacherModal').classList.remove('hidden');
+}
+
+$('#teacherForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const payload = {
+    national_id: $('#tchNationalId').value.trim(),
+    full_name: $('#tchName').value.trim(),
+    school_id: Number($('#tchSchool').value),
+    subject: $('#tchSubject').value,
+    phone: $('#tchPhone').value.trim() || null
+  };
+
+  $('#btnSaveTeacher').disabled = true;
+  try {
+    if (state.editingTeacher) {
+      const { error } = await DB.from('teachers').update(payload).eq('national_id', state.editingTeacher.national_id);
+      if (error) throw error;
+      toast('✅ تم تحديث المعلم', 'success');
+    } else {
+      const { error } = await DB.from('teachers').insert(payload);
+      if (error) throw error;
+      toast('✅ تمت إضافة المعلم', 'success');
+    }
+    closeModal('teacherModal');
+    await loadTeachers();
+    renderTeachers();
+  } catch (err) {
+    toast('فشل الحفظ: ' + err.message, 'error');
+  } finally {
+    $('#btnSaveTeacher').disabled = false;
+  }
+});
+
+async function togglePermission(nid, currentStatus) {
+  try {
+    const { error } = await DB.from('teachers').update({ can_add_questions: !currentStatus }).eq('national_id', nid);
+    if (error) throw error;
+    toast(`تم ${currentStatus ? 'سحب' : 'منح'} الصلاحية بنجاح`, 'success');
+    await loadTeachers();
+    renderTeachers();
+  } catch (err) {
+    toast('فشل تعديل الصلاحية: ' + err.message, 'error');
+  }
+}
+
+// ==========================================
+// 7. إحصائيات الأسئلة
+// ==========================================
+async function renderQuestionsStats() {
+  const [qRes, mRes, sRes] = await Promise.all([
+    DB.from('questions').select('*', { count: 'exact', head: true }),
+    DB.from('questions').select('*', { count: 'exact', head: true }).eq('subject', 'رياضيات'),
+    DB.from('questions').select('*', { count: 'exact', head: true }).eq('subject', 'علوم')
+  ]);
+
+  $('#questionStats').innerHTML = `
+    <div class="stat-card"><div class="val">${qRes.count || 0}</div><div class="lbl">إجمالي الأسئلة</div></div>
+    <div class="stat-card gold"><div class="val">${mRes.count || 0}</div><div class="lbl">أسئلة الرياضيات</div></div>
+    <div class="stat-card green"><div class="val">${sRes.count || 0}</div><div class="lbl">أسئلة العلوم</div></div>
+  `;
+}
+
+// ==========================================
+// 8. ربط الأحداث والتبويبات
+// ==========================================
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + key));
+  });
+});
+
+$('#schoolSearch').addEventListener('input', renderSchools);
+$('#teacherSearch').addEventListener('input', renderTeachers);
+$('#schoolFilter').addEventListener('change', renderTeachers);
+
+['schoolModal', 'teacherModal'].forEach(id => {
+  $('#' + id).addEventListener('click', (e) => {
+    if (e.target.id === id) closeModal(id);
+  });
+});
+
+// تشغيل
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة الطالب — TIMSS 2027</title>
+<style>
+/* ===== الأنماط الأساسية ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', 'Tahoma', sans-serif;
+  background: linear-gradient(135deg, #1a3a5c, #2c5f8a, #1e4d73);
+  min-height: 100vh; color: #333; padding: 20px;
+}
+.hidden { display: none !important; }
+
+.container {
+  max-width: 1200px; margin: 0 auto; background: #fff;
+  border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  overflow: hidden; animation: fadeIn .4s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity:1; transform:none;} }
+
+/* ===== الرأس ===== */
+.header {
+  background: linear-gradient(135deg, #1a3a5c, #2c5f8a);
+  color: #fff; padding: 20px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+.header-info h1 { font-size: 22px; margin-bottom: 4px; }
+.header-info p { font-size: 13px; opacity: .85; }
+.header-user { display: flex; align-items: center; gap: 20px; }
+.user-badge {
+  background: rgba(255,255,255,.15); padding: 8px 16px;
+  border-radius: 12px; font-size: 14px; font-weight: 700;
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+/* ===== التبويبات ===== */
+.tabs {
+  display: flex; background: #f0f4f8; border-bottom: 2px solid #d8e2ec;
+  overflow-x: auto;
+}
+.tab {
+  padding: 15px 25px; background: none; border: none;
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  color: #6b7c8f; cursor: pointer; border-bottom: 3px solid transparent;
+  transition: all .2s; white-space: nowrap;
+}
+.tab:hover { color: #2c5f8a; background: #e8eef4; }
+.tab.active { color: #1a3a5c; border-bottom-color: #2c5f8a; background: #fff; }
+
+/* ===== المحتوى ===== */
+.content { padding: 24px; }
+.tab-panel { display: none; animation: fadeIn .3s ease; }
+.tab-panel.active { display: block; }
+
+/* ===== البطاقات والإحصائيات ===== */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px; margin-bottom: 24px;
+}
+.stat-card {
+  background: #fff; border: 2px solid #d8e2ec; border-radius: 16px;
+  padding: 20px; text-align: center; transition: transform .2s;
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,.05); }
+.stat-card .val { font-size: 32px; font-weight: 800; color: #1a3a5c; margin-bottom: 5px; }
+.stat-card .lbl { font-size: 14px; color: #6b7c8f; font-weight: 600; }
+.stat-card.green .val { color: #1e7e34; }
+.stat-card.red .val { color: #c0392b; }
+.stat-card.gold .val { color: #b8860b; }
+
+/* ===== أزرار البدء بالاختبار ===== */
+.exam-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.exam-card {
+  background: #f8fbfd; border: 2px solid #e4ecf3; border-radius: 16px;
+  padding: 24px; text-align: center; position: relative; overflow: hidden;
+}
+.exam-card h3 { font-size: 20px; color: #1a3a5c; margin-bottom: 10px; }
+.exam-card p { font-size: 13px; color: #6b7c8f; margin-bottom: 20px; line-height: 1.6; }
+.exam-card::before { content: ''; position: absolute; top: 0; right: 0; width: 100%; height: 5px; }
+.exam-card.math::before { background: #b8860b; }
+.exam-card.sci::before { background: #1e7e34; }
+
+/* ===== الأزرار ===== */
+.btn {
+  padding: 12px 24px; border-radius: 10px; border: none;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .2s; display: inline-flex;
+  align-items: center; justify-content: center; gap: 8px;
+}
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(135deg, #1a3a5c, #2c5f8a); color: #fff; width: 100%; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26,58,92,.35); }
+.btn-light { background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.3); }
+.btn-light:hover { background: rgba(255,255,255,.3); }
+.btn-sm { padding: 8px 16px; font-size: 13px; width: auto; border-radius: 8px;}
+.btn-success { background: #1e7e34; color: #fff; }
+.btn-success:hover { background: #16652a; }
+
+/* ===== الجداول ===== */
+.table-wrap {
+  background: #fff; border: 1px solid #e4ecf3; border-radius: 12px;
+  overflow: auto; max-height: 400px; margin-bottom: 20px;
+}
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th {
+  background: #f0f4f8; color: #1a3a5c; font-weight: 700;
+  padding: 14px 12px; text-align: right; border-bottom: 2px solid #d8e2ec;
+  position: sticky; top: 0;
+}
+tbody td { padding: 12px; border-bottom: 1px solid #eef2f6; }
+tbody tr:hover { background: #f8fbfd; }
+.empty-row td { text-align: center; padding: 30px; color: #6b7c8f; }
+
+/* ===== أدوات مساعدة ===== */
+.badge-ok { color: #1e7e34; font-weight: bold; }
+.badge-no { color: #c0392b; font-weight: bold; }
+.section-title { font-size: 18px; color: #1a3a5c; margin-bottom: 15px; border-right: 4px solid #2c5f8a; padding-right: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+/* ===== نموذج البيانات ===== */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 700; color: #4a5c6e; margin-bottom: 6px; }
+.form-group input { width: 100%; padding: 12px; border: 2px solid #d8e2ec; border-radius: 10px; font-family: inherit; font-size: 14px; }
+.form-group input:focus { outline: none; border-color: #2c5f8a; }
+.form-group input:disabled { background: #f0f4f8; cursor: not-allowed; }
+
+/* ===== المودال والإشعارات ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,30,50,.65);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal {
+  background: #fff; border-radius: 16px; padding: 30px;
+  max-width: 500px; width: 100%; text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.modal h2 { color: #1a3a5c; margin-bottom: 15px; }
+.modal p { color: #4a5c6e; margin-bottom: 25px; font-size: 15px; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+.toast-container {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 3000; display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  background: #333; color: #fff; padding: 12px 24px;
+  border-radius: 10px; font-size: 14px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3); animation: toastIn .3s ease;
+}
+.toast.success { background: #1e7e34; }
+.toast.error { background: #c0392b; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-20px);} to { opacity:1; transform:none;} }
+
+.loading {
+  position: fixed; inset: 0; background: rgba(15,30,50,.85);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; z-index: 5000; color: #fff;
+}
+.spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- شاشة التحميل -->
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <p style="margin-top: 15px;">جاري تحميل البيانات...</p>
+</div>
+
+<!-- الحاوية الرئيسية -->
+<div class="container hidden" id="mainContainer">
+  <header class="header">
+    <div class="header-info">
+      <h1>🎓 بوابة الطالب</h1>
+      <p>منصة TIMSS 2027 — التقييم التربوي</p>
+    </div>
+    <div class="header-user">
+      <div class="user-badge" id="studentInfo">—</div>
+      <button class="btn btn-light" data-logout>🚪 خروج</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">📊 لوحتي</button>
+    <button class="tab" data-tab="exams">📝 الاختبارات</button>
+    <button class="tab" data-tab="performance">📈 أدائي التفصيلي</button>
+    <button class="tab" data-tab="profile">👤 بياناتي</button>
+  </nav>
+
+  <main class="content">
+    
+    <!-- 1. تبويب اللوحة الرئيسية -->
+    <section class="tab-panel active" id="tab-dashboard">
+      <div class="stats-grid" id="dashboardStats"></div>
+      
+      <h2 class="section-title">آخر النشاطات</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>المادة</th>
+              <th>الفرع</th>
+              <th>الصعوبة</th>
+              <th>النتيجة</th>
+              <th>التاريخ</th>
+            </tr>
+          </thead>
+          <tbody id="recentActivityBody">
+            <tr class="empty-row"><td colspan="5">لا توجد نشاطات سابقة</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2. تبويب الاختبارات -->
+    <section class="tab-panel" id="tab-exams">
+      <h2 class="section-title">ابدأ اختباراً جديداً</h2>
+      <p style="color: #6b7c8f; margin-bottom: 20px; font-size: 14px;">اختر المادة التي ترغب في التدرب عليها. سيتم عرض 40 سؤالاً متنوعاً.</p>
+      
+      <div class="exam-cards">
+        <div class="exam-card math">
+          <h3>📐 الرياضيات</h3>
+          <p>أسئلة في الجبر، الهندسة، الإحصاء والاحتمالات.</p>
+          <button class="btn btn-primary" onclick="startExam('رياضيات')">🚀 ابدأ اختبار الرياضيات</button>
+        </div>
+        <div class="exam-card sci">
+          <h3>🔬 العلوم</h3>
+          <p>أسئلة في الأحياء، الكيمياء، الفيزياء، وعلوم الأرض.</p>
+          <button class="btn btn-primary" onclick="startExam('علوم')">🚀 ابدأ اختبار العلوم</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. تبويب الأداء التفصيلي -->
+    <section class="tab-panel" id="tab-performance">
+      
+      <!-- أزرار الطباعة والتصدير -->
+      <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: flex-end;">
+        <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇️ تصدير CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="printReport()">🖨️ طباعة التقرير</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h2 class="section-title">حسب مستوى الصعوبة</h2>
+          <div class="table-wrap" style="max-height: 300px;">
+            <table>
+              <thead><tr><th>المستوى</th><th>المحاولات</th><th>نسبة الصواب</th></tr></thead>
+              <tbody id="perfDifficultyBody"><tr class="empty-row"><td colspan="3">—</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h2 class="section-title">حسب المستوى المعرفي</h2>
+          <div class="table-wrap" style="max-height: 300px;">
+            <table>
+              <thead><tr><th>المستوى</th><th>المحاولات</th><th>نسبة الصواب</th></tr></thead>
+              <tbody id="perfCognitiveBody"><tr class="empty-row"><td colspan="3">—</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <h2 class="section-title">حسب المادة</h2>
+          <div class="table-wrap" style="max-height: 300px;">
+            <table>
+              <thead><tr><th>المادة</th><th>إجمالي الأسئلة</th><th>صحيحة</th><th>خاطئة</th><th>نسبة الصواب</th></tr></thead>
+              <tbody id="perfSubjectBody"><tr class="empty-row"><td colspan="5">—</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. تبويب بياناتي -->
+    <section class="tab-panel" id="tab-profile">
+      <div class="card" style="max-width:600px; background:#fff; border:2px solid #d8e2ec; border-radius:16px; padding:24px;">
+        <h2 class="section-title">👤 بياناتي</h2>
+        <div class="form-group">
+          <label>الاسم الكامل</label>
+          <input type="text" id="profName" disabled>
+        </div>
+        <div class="form-group">
+          <label>الرقم الوطني</label>
+          <input type="text" id="profNationalId" disabled>
+        </div>
+        <div class="form-group">
+          <label>الصف والشعبة</label>
+          <input type="text" id="profClass" disabled>
+        </div>
+        <div class="form-group">
+          <label>المدرسة</label>
+          <input type="text" id="profSchool" disabled>
+        </div>
+        <div class="form-group">
+          <label>رقم الهاتف (قابل للتعديل)</label>
+          <input type="tel" id="profPhone" placeholder="مثال: 0791234567" maxlength="15">
+        </div>
+        <button class="btn btn-primary" onclick="savePhone()" style="width:auto; margin-top:10px;">💾 حفظ رقم الهاتف</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- نافذة تأكيد بدء الاختبار -->
+<div class="modal-overlay hidden" id="startExamModal">
+  <div class="modal">
+    <h2>📝 تأكيد بدء الاختبار</h2>
+    <p id="examModalText">هل أنت مستعد لبدء الاختبار؟</p>
+    <div class="modal-actions">
+      <button class="btn btn-light" onclick="closeExamModal()" style="background: #eef2f6; color: #4a5c6e;">إلغاء</button>
+      <button class="btn btn-primary" id="btnConfirmExam" onclick="confirmExam()">نعم، ابدأ الآن</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- السكربتات -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+
+<script>
+// ==========================================
+// 1. الإعدادات الأساسية
+// ==========================================
+const DB = window.supabaseClient;
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function toast(msg, type = 'info', ms = 3200) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  $('#toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, ms);
+}
+
+// ==========================================
+// 2. الحالة العامة
+// ==========================================
+const state = {
+  session: null,
+  student: null,
+  school: null,
+  attempts: [],
+  selectedSubject: null
+};
+
+// ==========================================
+// 3. التهيئة الأولية
+// ==========================================
+async function init() {
+  try {
+    if (!DB) throw new Error('فشل الاتصال بقاعدة البيانات');
+    
+    const session = auth.getSession();
+    if (!session || session.role !== 'student') { location.href = 'index.html'; return; }
+    state.session = session;
+
+    const { data: student, error: sErr } = await DB
+      .from('students')
+      .select('*, schools(school_name)')
+      .eq('national_id', session.national_id)
+      .maybeSingle();
+
+    if (sErr) throw sErr;
+    if (!student) throw new Error('لم يتم العثور على بيانات الطالب');
+
+    state.student = student;
+    state.school = student.schools;
+
+    $('#studentInfo').innerHTML = `
+      ${esc(student.full_name)} 
+      <span style="font-size: 12px; opacity: 0.8; margin-right: 5px;">
+        (${esc(student.grade || '')} - ${esc(student.section || '')})
+      </span>
+    `;
+
+    // تعبئة بيانات الملف الشخصي
+    $('#profName').value = student.full_name || '';
+    $('#profNationalId').value = student.national_id || '';
+    $('#profClass').value = `${student.grade || ''} - ${student.section || ''}`;
+    $('#profSchool').value = state.school ? state.school.school_name : '—';
+    $('#profPhone').value = student.phone || '';
+
+    await loadAttempts();
+
+    $('#loading').classList.add('hidden');
+    $('#mainContainer').classList.remove('hidden');
+
+  } catch (err) {
+    console.error(err);
+    $('#loading').innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <h2 style="color: #c0392b; margin-bottom: 15px;">⚠️ خطأ</h2>
+        <p>${esc(err.message)}</p>
+        <button onclick="location.href='index.html'" class="btn btn-primary" style="margin-top: 20px; width: auto;">العودة للدخول</button>
+      </div>
+    `;
+  }
+}
+
+// ==========================================
+// 4. جلب وعرض المحاولات
+// ==========================================
+async function loadAttempts() {
+  const { data, error } = await DB
+    .from('student_question_attempts')
+    .select('*')
+    .eq('student_id', state.session.national_id)
+    .order('updated_at', { ascending: false });
+
+  if (error) throw error;
+  state.attempts = data || [];
+  
+  renderDashboard();
+  renderPerformance();
+}
+
+function renderDashboard() {
+  const total = state.attempts.length;
+  const correct = state.attempts.filter(a => a.is_correct).length;
+  const accuracy = total ? ((correct / total) * 100).toFixed(1) : 0;
+  
+  $('#dashboardStats').innerHTML = `
+    <div class="stat-card"><div class="val">${total}</div><div class="lbl">إجمالي الأسئلة</div></div>
+    <div class="stat-card green"><div class="val">${correct}</div><div class="lbl">إجابات صحيحة</div></div>
+    <div class="stat-card red"><div class="val">${total - correct}</div><div class="lbl">إجابات خاطئة</div></div>
+    <div class="stat-card gold"><div class="val">${accuracy}%</div><div class="lbl">نسبة الصواب</div></div>
+  `;
+
+  const recent = state.attempts.slice(0, 5);
+  const tbody = $('#recentActivityBody');
+  
+  if (recent.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">لم تقم بحل أي أسئلة حتى الآن</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = recent.map(a => `
+    <tr>
+      <td>${esc(a.subject || '—')}</td>
+      <td>${esc(a.branch || '—')}</td>
+      <td>${diffBadge(a.difficulty)}</td>
+      <td>${a.is_correct ? '<span class="badge-ok">✔ صحيح</span>' : '<span class="badge-no">✘ خطأ</span>'}</td>
+      <td>${a.updated_at ? new Date(a.updated_at).toLocaleDateString('ar-EG') : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function renderPerformance() {
+  const groupBy = (key, labelMap) => {
+    const groups = {};
+    state.attempts.forEach(a => {
+      const k = a[key] || 'غير محدد';
+      if (!groups[k]) groups[k] = { total: 0, correct: 0 };
+      groups[k].total++;
+      if (a.is_correct) groups[k].correct++;
+    });
+    return Object.keys(groups).map(k => {
+      const label = labelMap ? labelMap[k] || k : k;
+      const { total, correct } = groups[k];
+      return { label, total, correct, accuracy: ((correct / total) * 100).toFixed(1) };
+    });
+  };
+
+  renderTable('#perfDifficultyBody', groupBy('difficulty', { EASY: 'سهل', MEDIUM: 'متوسط', HARD: 'صعب' }));
+  renderTable('#perfCognitiveBody', groupBy('cognitive', { KNOWING: 'معرفة', APPLYING: 'تطبيق', REASONING: 'استدلال' }));
+
+  const subjData = groupBy('subject');
+  const subjBody = $('#perfSubjectBody');
+  if (subjData.length === 0) {
+    subjBody.innerHTML = '<tr class="empty-row"><td colspan="5">لا توجد بيانات</td></tr>';
+  } else {
+    subjBody.innerHTML = subjData.map(r => `
+      <tr>
+        <td>${esc(r.label)}</td>
+        <td>${r.total}</td>
+        <td class="badge-ok">${r.correct}</td>
+        <td class="badge-no">${r.total - r.correct}</td>
+        <td>${r.accuracy}%</td>
+      </tr>
+    `).join('');
+  }
+}
+
+function renderTable(selector, data) {
+  const tbody = $(selector);
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">لا توجد بيانات</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => `
+    <tr><td>${esc(r.label)}</td><td>${r.total}</td><td>${r.accuracy}%</td></tr>
+  `).join('');
+}
+
+function diffBadge(d) {
+  if (d === 'EASY') return '<span style="color:#1e7e34; font-weight:bold;">سهل</span>';
+  if (d === 'MEDIUM') return '<span style="color:#b8860b; font-weight:bold;">متوسط</span>';
+  if (d === 'HARD') return '<span style="color:#c0392b; font-weight:bold;">صعب</span>';
+  return esc(d || '—');
+}
+
+// ==========================================
+// 5. تعديل رقم الهاتف
+// ==========================================
+async function savePhone() {
+  const phone = $('#profPhone').value.trim();
+  if (phone && !/^[0-9+\- ]{6,15}$/.test(phone)) {
+    toast('رقم الهاتف غير صالح', 'error'); return;
+  }
+  
+  try {
+    const { error } = await DB
+      .from('students')
+      .update({ phone: phone || null })
+      .eq('national_id', state.session.national_id);
+      
+    if (error) throw error;
+    state.student.phone = phone || null;
+    toast('✅ تم حفظ رقم الهاتف بنجاح', 'success');
+  } catch (err) {
+    toast('فشل الحفظ: ' + err.message, 'error');
+  }
+}
+
+// ==========================================
+// 6. الطباعة والتصدير (فتح في صفحة جديدة)
+// ==========================================
+function printReport() {
+  if (!state.student) return;
+  const w = window.open('', '_blank');
+  const date = new Date().toLocaleDateString('ar-EG');
+  
+  let html = `
+    <html dir="rtl"><head><title>تقرير الطالب - ${state.student.full_name}</title>
+    <style>
+      body { font-family: 'Tahoma', sans-serif; padding: 20px; color: #333; }
+      h1 { color: #1a3a5c; border-bottom: 2px solid #2c5f8a; padding-bottom: 10px; }
+      .meta { margin-bottom: 20px; font-size: 16px; line-height: 1.6; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+      th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: right; }
+      th { background: #f1f5f9; color: #1a3a5c; }
+      .correct { color: green; } .wrong { color: red; }
+    </style></head><body>
+      <h1>📊 تقرير أداء الطالب</h1>
+      <div class="meta">
+        <b>الاسم:</b> ${state.student.full_name} <br>
+        <b>الرقم الوطني:</b> ${state.student.national_id} <br>
+        <b>الصف والشعبة:</b> ${state.student.grade} - ${state.student.section} <br>
+        <b>المدرسة:</b> ${state.school ? state.school.school_name : '—'} <br>
+        <b>تاريخ التقرير:</b> ${date}
+      </div>
+      <table>
+        <thead><tr><th>المادة</th><th>الفرع</th><th>الصعوبة</th><th>النتيجة</th><th>الدرجة</th><th>التاريخ</th></tr></thead>
+        <tbody>
+  `;
+  
+  state.attempts.forEach(a => {
+    html += `<tr>
+      <td>${a.subject || '—'}</td>
+      <td>${a.branch || '—'}</td>
+      <td>${a.difficulty || '—'}</td>
+      <td class="${a.is_correct ? 'correct' : 'wrong'}">${a.is_correct ? 'صحيح' : 'خطأ'}</td>
+      <td>${a.score || 0}</td>
+      <td>${a.updated_at ? new Date(a.updated_at).toLocaleDateString('ar-EG') : '—'}</td>
+    </tr>`;
+  });
+  
+  html += `</tbody></table>
+    <script>window.onload = function() { window.print(); }<\/script>
+    </body></html>`;
+    
+  w.document.write(html);
+  w.document.close();
+}
+
+function exportCSV() {
+  if (state.attempts.length === 0) { toast('لا توجد بيانات لتصديرها', 'warning'); return; }
+  
+  const headers = ['المادة', 'الفرع', 'الصعوبة', 'المستوى المعرفي', 'صحيح؟', 'الدرجة', 'التاريخ'];
+  let csvContent = '\uFEFF'; // BOM لدعم العربية في الإكسل
+  
+  csvContent += headers.join(',') + '\n';
+  
+  state.attempts.forEach(a => {
+    const row = [
+      a.subject || '',
+      a.branch || '',
+      a.difficulty || '',
+      a.cognitive || '',
+      a.is_correct ? 'نعم' : 'لا',
+      a.score || 0,
+      a.updated_at ? new Date(a.updated_at).toLocaleDateString('ar-EG') : ''
+    ];
+    csvContent += row.map(v => `"${v}"`).join(',') + '\n';
+  });
+  
+  // فتح في صفحة جديدة للتحميل
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `تقرير_${state.student.full_name}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  
+  toast('✅ تم تصدير الملف بنجاح', 'success');
+}
+
+// ==========================================
+// 7. بدء الاختبار والتبويبات
+// ==========================================
+function startExam(subject) {
+  state.selectedSubject = subject;
+  $('#examModalText').textContent = `هل أنت مستعد لبدء اختبار ${subject}؟ سيتم عرض 40 سؤالاً.`;
+  $('#startExamModal').classList.remove('hidden');
+}
+function closeExamModal() {
+  $('#startExamModal').classList.add('hidden');
+  state.selectedSubject = null;
+}
+function confirmExam() {
+  if (!state.selectedSubject) return;
+  toast('جاري تجهيز الاختبار...', 'success');
+  setTimeout(() => { location.href = `exam.html?subject=${encodeURIComponent(state.selectedSubject)}`; }, 1000);
+}
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + key));
+  });
+});
+
+init();
+</script>
+</body>
+</html>

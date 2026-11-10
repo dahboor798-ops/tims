@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة المعلم — TIMSS 2027</title>
+<style>
+/* (نفس التصميم السابق الذي أرسلته لك، لضمان عدم تغييره) */
+* { box-sizing: border-box; }
+body { margin: 0; padding: 20px; font-family: 'Segoe UI', 'Tahoma', sans-serif; background: linear-gradient(135deg, #1a3a5c, #2c5f8a, #1e4d73); min-height: 100vh; color: #333; }
+.hidden { display: none !important; }
+.container { max-width: 1400px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.35); overflow: hidden; animation: fadeIn .4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity:1; transform:none;} }
+.header { background: linear-gradient(135deg, #1a3a5c, #2c5f8a); color: #fff; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.header h1 { margin: 0; font-size: 22px; }
+.header .subtitle { margin: 4px 0 0; opacity: .85; font-size: 13px; }
+.header-user { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.user-info { display: flex; flex-direction: column; gap: 4px; text-align: left; }
+.user-name { font-weight: 700; font-size: 15px; }
+.user-meta { font-size: 12px; opacity: .85; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; margin-top: 4px; }
+.badge-ok { background: #d4edda; color: #1e7e34; }
+.badge-no { background: #f8d7da; color: #c0392b; }
+.header-actions { display: flex; gap: 8px; }
+.btn { padding: 9px 16px; border-radius: 10px; border: none; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(135deg, #1a3a5c, #2c5f8a); color: #fff; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(26,58,92,.35); }
+.btn-light { background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.25); }
+.btn-light:hover { background: rgba(255,255,255,.28); }
+.btn-success { background: #1e7e34; color: #fff; }
+.btn-success:hover:not(:disabled) { background: #16652a; }
+.btn-danger { background: #c0392b; color: #fff; }
+.btn-danger:hover:not(:disabled) { background: #a93226; }
+.btn-secondary { background: #eef2f6; color: #2c5f8a; }
+.btn-secondary:hover:not(:disabled) { background: #d8e2ec; }
+.btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+.btn-icon { padding: 6px 8px; font-size: 15px; }
+.tabs { display: flex; background: #f0f4f8; border-bottom: 2px solid #d8e2ec; overflow-x: auto; }
+.tab { padding: 14px 22px; background: none; border: none; font-family: inherit; font-size: 14px; font-weight: 600; color: #6b7c8f; cursor: pointer; border-bottom: 3px solid transparent; transition: all .2s; white-space: nowrap; }
+.tab:hover { color: #2c5f8a; background: #e8eef4; }
+.tab.active { color: #1a3a5c; border-bottom-color: #2c5f8a; background: #fff; }
+.content { padding: 24px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn .3s ease; }
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
+.toolbar input, .toolbar select { padding: 9px 12px; border: 2px solid #d8e2ec; border-radius: 10px; font-family: inherit; font-size: 13px; background: #fff; transition: border-color .2s; }
+.toolbar input:focus, .toolbar select:focus { outline: none; border-color: #2c5f8a; box-shadow: 0 0 0 4px rgba(44,95,138,.12); }
+.toolbar .spacer { flex: 1; }
+.table-wrap { background: #fff; border: 1px solid #e4ecf3; border-radius: 12px; overflow: auto; max-height: 640px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { background: #f0f4f8; color: #1a3a5c; font-weight: 700; padding: 12px 10px; text-align: right; border-bottom: 2px solid #d8e2ec; position: sticky; top: 0; z-index: 2; }
+tbody td { padding: 10px; border-bottom: 1px solid #eef2f6; vertical-align: middle; }
+tbody tr:hover { background: #f8fbfd; }
+tbody tr:last-child td { border-bottom: none; }
+.empty-row td { text-align: center; padding: 40px; color: #6b7c8f; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.stat-card { background: #fff; border: 2px solid #d8e2ec; border-radius: 12px; padding: 16px; text-align: center; }
+.stat-card .val { font-size: 26px; font-weight: 800; color: #1a3a5c; }
+.stat-card .lbl { font-size: 12px; color: #6b7c8f; margin-top: 4px; }
+.stat-card.green .val { color: #1e7e34; }
+.stat-card.red .val { color: #c0392b; }
+.stat-card.gold .val { color: #b8860b; }
+.card { background: #fff; border: 2px solid #d8e2ec; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 14px; color: #1a3a5c; font-size: 15px; padding-bottom: 10px; border-bottom: 1px solid #eef2f6; }
+.card-section-title { font-size: 14px; font-weight: 700; color: #1a3a5c; margin: 18px 0 10px; padding-right: 8px; border-right: 4px solid #2c5f8a; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; font-weight: 700; color: #4a5c6e; margin-bottom: 6px; }
+.form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 2px solid #d8e2ec; border-radius: 10px; font-family: inherit; font-size: 14px; transition: border-color .2s; background: #fff; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #2c5f8a; box-shadow: 0 0 0 4px rgba(44,95,138,.12); }
+.form-group input:disabled, .form-group input[readonly] { background: #f0f4f8; color: #4a5c6e; cursor: not-allowed; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hint { font-size: 11px; color: #6b7c8f; margin-top: 4px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(15,30,50,.65); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn .2s ease; }
+.modal { background: #fff; border-radius: 16px; padding: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.4); animation: modalIn .3s ease; }
+.modal-lg { max-width: 1000px; }
+@keyframes modalIn { from { opacity: 0; transform: scale(.95);} to { opacity:1; transform:none;} }
+.modal h2 { margin: 0 0 18px; color: #1a3a5c; font-size: 18px; padding-bottom: 12px; border-bottom: 2px solid #eef2f6; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid #eef2f6; }
+.toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { background: #333; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.3); animation: toastIn .3s ease; pointer-events: auto; max-width: 400px; }
+.toast.success { background: #1e7e34; }
+.toast.error { background: #c0392b; }
+.toast.warning { background: #b8860b; }
+.toast.info { background: #2c5f8a; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-20px);} to { opacity:1; transform:none;} }
+.loading { position: fixed; inset: 0; background: rgba(15,30,50,.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; color: #fff; }
+.spinner { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,.25); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { margin-top: 16px; font-size: 14px; }
+.empty-msg { text-align: center; padding: 40px; color: #6b7c8f; background: #f8fbfd; border-radius: 12px; font-size: 14px; }
+.diff-easy { background: #d4edda; color: #1e7e34; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+.diff-medium { background: #fff3cd; color: #b8860b; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+.diff-hard { background: #f8d7da; color: #c0392b; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+.ok-tick { color: #1e7e34; font-weight: 800; }
+.no-tick { color: #c0392b; font-weight: 800; }
+@media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } .header { flex-direction: column; align-items: stretch; } .content { padding: 16px; } }
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <p>جاري التحميل...</p>
+</div>
+
+<div class="container hidden" id="mainContainer">
+  <header class="header">
+    <div>
+      <h1>👨‍🏫 بوابة المعلم</h1>
+      <p class="subtitle">منصة TIMSS 2027 — تقييم تربوي</p>
+    </div>
+    <div class="header-user">
+      <div class="user-info">
+        <span class="user-name" data-user-name>—</span>
+        <span class="user-meta" id="userMeta">—</span>
+        <span id="permBadge"></span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-light" id="btnReportsTop">📊 التقارير</button>
+        <button class="btn btn-light" data-logout>🚪 خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="students">🎓 طلابي</button>
+    <button class="tab" data-tab="questions">📚 أسئلتي</button>
+    <button class="tab" data-tab="reports">📊 التقارير</button>
+    <button class="tab" data-tab="profile">👤 بياناتي</button>
+  </nav>
+
+  <main class="content">
+
+    <!-- TAB: Students -->
+    <section class="tab-panel active" id="tab-students">
+      <div class="toolbar">
+        <input type="text" id="studentSearch" placeholder="🔍 بحث بالاسم أو الرقم الوطني..." style="min-width:220px;">
+        <select id="gradeFilter"><option value="">كل الصفوف</option></select>
+        <select id="sectionFilter"><option value="">كل الشعب</option></select>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" id="btnAddStudent">➕ إضافة طالب</button>
+      </div>
+      <div class="table-wrap">
+        <table id="studentsTable">
+          <thead>
+            <tr><th style="width:50px;">#</th><th>الرقم الوطني</th><th>الاسم الكامل</th><th>الصف</th><th>الشعبة</th><th>الهاتف</th><th style="width:180px;">إجراءات</th></tr>
+          </thead>
+          <tbody id="studentsBody"><tr class="empty-row"><td colspan="7">جاري التحميل...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: Questions -->
+    <section class="tab-panel" id="tab-questions">
+      <div class="stats-grid" id="questionStats"></div>
+      <div class="card">
+        <h3>⚡ إجراءات سريعة</h3>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" id="btnManageQuestions">🚀 إدارة الأسئلة</button>
+          <button class="btn btn-secondary" id="btnRefreshQuestions">🔄 تحديث الإحصائيات</button>
+        </div>
+        <p class="hint" id="questionsPermHint" style="margin-top:10px;"></p>
+      </div>
+      <div class="card">
+        <h3>📋 أحدث أسئلتي (آخر 10)</h3>
+        <div class="table-wrap" style="max-height:400px;">
+          <table>
+            <thead><tr><th>#</th><th>المادة</th><th>الفرع</th><th>الموضوع</th><th>الصعوبة</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+            <tbody id="recentQuestionsBody"><tr class="empty-row"><td colspan="7">لا توجد أسئلة بعد</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: Reports -->
+    <section class="tab-panel" id="tab-reports">
+      <div class="toolbar">
+        <h3 style="margin:0; color:#1a3a5c;">📊 تقاريري — مادة: <span id="reportSubjectLabel" style="color:#2c5f8a;"></span></h3>
+        <div class="spacer"></div>
+        <button class="btn btn-secondary" id="btnRefreshReports">🔄 تحديث</button>
+        <button class="btn btn-success" onclick="exportTeacherCSV()">⬇️ تصدير CSV</button>
+        <button class="btn btn-primary" onclick="printTeacherReport()">🖨️ طباعة التقرير</button>
+      </div>
+
+      <div class="card-section-title">🏫 ملخص المدرسة</div>
+      <div class="stats-grid" id="schoolSummaryStats">
+        <div class="stat-card"><div class="val">—</div><div class="lbl">إجمالي الطلاب</div></div>
+      </div>
+
+      <div class="card-section-title">👥 تفصيل الشعب</div>
+      <div class="table-wrap" style="max-height:400px;">
+        <table>
+          <thead><tr><th>الصف</th><th>الشعبة</th><th>عدد الطلاب</th><th>عدد المحاولات</th><th>نسبة الصواب</th><th>متوسط الدرجة</th></tr></thead>
+          <tbody id="sectionsReportBody"><tr class="empty-row"><td colspan="6">—</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="card-section-title">🎓 تقرير طالب فردي</div>
+      <div class="toolbar">
+        <select id="reportStudentSelect" style="min-width:280px;"><option value="">— اختر طالباً —</option></select>
+        <button class="btn btn-primary" id="btnShowStudentReport">عرض التقرير</button>
+      </div>
+
+      <div class="card-section-title">📈 تفصيل حسب الصعوبة والمستوى المعرفي</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="card">
+          <h3>حسب الصعوبة</h3>
+          <table><thead><tr><th>الصعوبة</th><th>المحاولات</th><th>نسبة الصواب</th></tr></thead><tbody id="difficultyBreakdownBody"><tr class="empty-row"><td colspan="3">—</td></tr></tbody></table>
+        </div>
+        <div class="card">
+          <h3>حسب المستوى المعرفي</h3>
+          <table><thead><tr><th>المستوى</th><th>المحاولات</th><th>نسبة الصواب</th></tr></thead><tbody id="cognitiveBreakdownBody"><tr class="empty-row"><td colspan="3">—</td></tr></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: Profile -->
+    <section class="tab-panel" id="tab-profile">
+      <div class="card" style="max-width:640px;">
+        <h3>👤 بياناتي</h3>
+        <div class="form-group"><label>الاسم الكامل</label><input type="text" id="profFullName" readonly></div>
+        <div class="form-group"><label>الرقم الوطني (اسم الدخول)</label><input type="text" id="profNationalId" readonly><div class="hint">🔒 لا يمكن تعديله</div></div>
+        <div class="form-group"><label>المدرسة / رقم المنشأة</label><input type="text" id="profSchool" readonly><div class="hint">🔒 لا يمكن تعديله</div></div>
+        <div class="form-group"><label>التخصص</label><input type="text" id="profSubject" readonly><div class="hint">🔒 لا يمكن تعديله</div></div>
+        <div class="form-group"><label>رقم الهاتف <span style="color:#1e7e34;">(قابل للتعديل)</span></label><input type="tel" id="profPhone" placeholder="مثال: 0791234567" maxlength="15"></div>
+        <div style="display:flex; gap:10px; margin-top:18px;">
+          <button class="btn btn-primary" id="btnSaveProfile">💾 حفظ التغييرات</button>
+          <button class="btn btn-secondary" id="btnResetProfile">↩️ استعادة</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Modals (سأختصرها هنا لأنها نفس السابقة، لن تتغير) -->
+<div class="modal-overlay hidden" id="studentModal">
+  <div class="modal">
+    <h2 id="studentModalTitle">➕ إضافة طالب</h2>
+    <form id="studentForm" onsubmit="event.preventDefault();">
+      <div class="form-group"><label>الرقم الوطني <span style="color:#c0392b;">*</span></label><input type="text" id="stNationalId" required pattern="[0-9]{6,15}" maxlength="15"><div class="hint" id="stNationalIdHint"></div></div>
+      <div class="form-group"><label>الاسم الكامل <span style="color:#c0392b;">*</span></label><input type="text" id="stFullName" required maxlength="100"></div>
+      <div class="form-row">
+        <div class="form-group"><label>الصف <span style="color:#c0392b;">*</span></label><input type="text" id="stGrade" required maxlength="20" list="gradesList" placeholder="مثال: العاشر"><datalist id="gradesList"><option value="الأول"><option value="الثاني"><option value="الثالث"><option value="الرابع"><option value="الخامس"><option value="السادس"><option value="السابع"><option value="الثامن"><option value="التاسع"><option value="العاشر"><option value="الحادي عشر"><option value="الثاني عشر"></datalist></div>
+        <div class="form-group"><label>الشعبة <span style="color:#c0392b;">*</span></label><input type="text" id="stSection" required maxlength="10" placeholder="مثال: أ"></div>
+      </div>
+      <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="stPhone" maxlength="15" placeholder="اختياري"></div>
+      <div class="form-group"><label>المدرسة / رقم المنشأة 🔒</label><input type="text" id="stSchoolDisplay" readonly><div class="hint">يُملأ تلقائياً من حسابك ولا يمكن تغييره</div></div>
+      <div class="modal-actions"><button type="button" class="btn btn-secondary" id="btnCancelStudent">إلغاء</button><button type="submit" class="btn btn-primary" id="btnSaveStudent">💾 حفظ</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="confirmModal">
+  <div class="modal" style="max-width:440px;">
+    <h2>⚠️ تأكيد الحذف</h2>
+    <p id="confirmMessage" style="font-size:14px; line-height:1.6;"></p>
+    <div class="modal-actions"><button class="btn btn-secondary" id="btnCancelConfirm">إلغاء</button><button class="btn btn-danger" id="btnConfirmDelete">🗑️ حذف</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="studentReportModal">
+  <div class="modal modal-lg">
+    <h2 id="srTitle">📊 تقرير الطالب</h2>
+    <div id="srMeta" style="font-size:13px; color:#4a5c6e; margin-bottom:14px;"></div>
+    <div class="stats-grid" id="srStats"></div>
+    <div class="modal-actions"><button class="btn btn-secondary" id="btnCloseSr">إغلاق</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+<script>
+// (نفس كود الجافاسكربت السابق، مع إضافة دالتي الطباعة والتصدير فقط)
+const DB = (window.supabaseClient && typeof window.supabaseClient.from === 'function') ? window.supabaseClient : window.db;
+const $  = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function toast(msg, type = 'info', ms = 3200) {
+  const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  $('#toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 350); }, ms);
+}
+function hideLoading() { $('#loading').classList.add('hidden'); }
+function showLoading() { $('#loading').classList.remove('hidden'); }
+
+const state = { session: null, teacher: null, school: null, students: [], editingStudent: null, pendingDelete: null, reportAttempts: null };
+
+async function initAuth() {
+  try { await auth.requireRole('teacher'); } catch (e) { location.href = 'index.html'; return false; }
+  const s = auth.getSession();
+  if (!s || s.role !== 'teacher') { location.href = 'index.html'; return false; }
+  state.session = s; return true;
+}
+
+async function loadTeacherData() {
+  const { data, error } = await DB.from('teachers').select('national_id, full_name, school_id, subject, phone, can_add_questions').eq('national_id', state.session.national_id).maybeSingle();
+  if (error) throw new Error('فشل تحميل بيانات المعلم: ' + error.message);
+  if (!data) throw new Error('لم يتم العثور على حساب المعلم في قاعدة البيانات.');
+  state.teacher = data;
+  if (data.school_id != null) {
+    const { data: sch, error: schErr } = await DB.from('schools').select('national_code, school_name, gender, school_type').eq('national_code', data.school_id).maybeSingle();
+    if (!schErr) state.school = sch;
+  }
+}
+
+function renderHeader() {
+  const t = state.teacher, s = state.school;
+  document.querySelectorAll('[data-user-name]').forEach(el => el.textContent = t.full_name || '—');
+  $('#userMeta').textContent = (s ? s.school_name : 'مدرسة غير محددة') + ' • ' + (t.subject || 'بدون تخصص') + ' • #' + t.national_id;
+  const badge = $('#permBadge');
+  if (t.can_add_questions) { badge.className = 'badge badge-ok'; badge.textContent = '✅ مصرّح بإضافة الأسئلة'; }
+  else { badge.className = 'badge badge-no'; badge.textContent = '⛔ غير مصرّح بإضافة الأسئلة'; }
+}
+
+function setupTabs() {
+  $$('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.tab;
+      $$('.tab').forEach(b => b.classList.toggle('active', b === btn));
+      $$('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + key));
+      if (key === 'reports') loadReports();
+      if (key === 'questions') loadQuestionsTab();
+    });
+  });
+  $('#btnReportsTop').addEventListener('click', () => { document.querySelector('.tab[data-tab="reports"]').click(); });
+}
+
+async function loadStudents() {
+  if (!state.teacher) return;
+  const { data, error } = await DB.from('students').select('national_id, full_name, school_id, grade, section, phone').eq('school_id', state.teacher.school_id).order('grade', { ascending: true }).order('section', { ascending: true }).order('full_name', { ascending: true });
+  if (error) throw new Error('فشل تحميل الطلاب: ' + error.message);
+  state.students = data || [];
+  renderStudents(); fillFilters(); fillReportStudentSelect();
+}
+
+function fillFilters() {
+  const grades = [...new Set(state.students.map(s => s.grade).filter(Boolean))].sort();
+  const sections = [...new Set(state.students.map(s => s.section).filter(Boolean))].sort();
+  const gf = $('#gradeFilter'), sf = $('#sectionFilter');
+  const gv = gf.value, sv = sf.value;
+  gf.innerHTML = '<option value="">كل الصفوف</option>' + grades.map(g => `<option>${esc(g)}</option>`).join('');
+  sf.innerHTML = '<option value="">كل الشعب</option>' + sections.map(x => `<option>${esc(x)}</option>`).join('');
+  gf.value = gv; sf.value = sv;
+}
+
+function renderStudents() {
+  const q = ($('#studentSearch').value || '').trim().toLowerCase();
+  const gf = $('#gradeFilter').value, sf = $('#sectionFilter').value;
+  const rows = state.students.filter(s => (!q || (s.national_id || '').toLowerCase().includes(q) || (s.full_name || '').toLowerCase().includes(q)) && (!gf || s.grade === gf) && (!sf || s.section === sf));
+  const body = $('#studentsBody');
+  if (!rows.length) { body.innerHTML = '<tr class="empty-row"><td colspan="7">لا يوجد طلاب مطابقون</td></tr>'; return; }
+  body.innerHTML = rows.map((s, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${esc(s.national_id)}</td><td>${esc(s.full_name)}</td><td>${esc(s.grade || '—')}</td><td>${esc(s.section || '—')}</td><td>${esc(s.phone || '—')}</td>
+      <td>
+        <button class="btn btn-sm btn-primary btn-icon" title="تعديل" onclick="openEditStudent('${esc(s.national_id)}')">✏️</button>
+        <button class="btn btn-sm btn-success btn-icon" title="تقرير" onclick="openStudentReport('${esc(s.national_id)}')">📊</button>
+        <button class="btn btn-sm btn-danger btn-icon" title="حذف" onclick="askDeleteStudent('${esc(s.national_id)}')">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAddStudent() {
+  state.editingStudent = null;
+  $('#studentModalTitle').textContent = '➕ إضافة طالب';
+  $('#stNationalId').value = ''; $('#stNationalId').readOnly = false; $('#stNationalIdHint').textContent = 'أرقام فقط، 6-15 خانة';
+  $('#stFullName').value = ''; $('#stGrade').value = ''; $('#stSection').value = ''; $('#stPhone').value = '';
+  const s = state.school; $('#stSchoolDisplay').value = s ? `${s.school_name} (#${s.national_code})` : `#${state.teacher.school_id}`;
+  $('#studentModal').classList.remove('hidden');
+  setTimeout(() => $('#stNationalId').focus(), 100);
+}
+
+function openEditStudent(nationalId) {
+  const s = state.students.find(x => x.national_id === nationalId); if (!s) return;
+  state.editingStudent = s;
+  $('#studentModalTitle').textContent = '✏️ تعديل بيانات طالب';
+  $('#stNationalId').value = s.national_id; $('#stNationalId').readOnly = true; $('#stNationalIdHint').textContent = '🔒 لا يمكن تعديل الرقم الوطني';
+  $('#stFullName').value = s.full_name || ''; $('#stGrade').value = s.grade || ''; $('#stSection').value = s.section || ''; $('#stPhone').value = s.phone || '';
+  const sc = state.school; $('#stSchoolDisplay').value = sc ? `${sc.school_name} (#${sc.national_code})` : `#${state.teacher.school_id}`;
+  $('#studentModal').classList.remove('hidden');
+}
+
+function closeStudentModal() { $('#studentModal').classList.add('hidden'); state.editingStudent = null; }
+
+async function saveStudent(ev) {
+  ev.preventDefault();
+  const nid = $('#stNationalId').value.trim(), name = $('#stFullName').value.trim(), grade = $('#stGrade').value.trim(), section = $('#stSection').value.trim(), phone = $('#stPhone').value.trim();
+  if (!/^[0-9]{6,15}$/.test(nid)) { toast('الرقم الوطني غير صالح', 'error'); return; }
+  if (!name || !grade || !section) { toast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
+  const payload = { full_name: name, grade, section, phone: phone || null };
+  $('#btnSaveStudent').disabled = true;
+  try {
+    if (state.editingStudent) {
+      const { error } = await DB.from('students').update(payload).eq('national_id', nid);
+      if (error) throw error; toast('✅ تم تحديث بيانات الطالب', 'success');
+    } else {
+      if (state.students.some(s => s.national_id === nid)) { toast('هذا الرقم الوطني موجود مسبقاً', 'error'); return; }
+      const insertPayload = { national_id: nid, school_id: state.teacher.school_id, ...payload };
+      const { error } = await DB.from('students').insert(insertPayload);
+      if (error) throw error; toast('✅ تمت إضافة الطالب', 'success');
+    }
+    closeStudentModal(); await loadStudents();
+  } catch (e) { toast('فشل الحفظ: ' + (e.message || e), 'error', 5000); }
+  finally { $('#btnSaveStudent').disabled = false; }
+}
+
+function askDeleteStudent(nationalId) {
+  const s = state.students.find(x => x.national_id === nationalId); if (!s) return;
+  state.pendingDelete = s;
+  $('#confirmMessage').innerHTML = `هل تريد حذف الطالب <b>${esc(s.full_name)}</b>؟<br><br>⚠️ سيتم أيضاً حذف جميع محاولاته نهائياً.`;
+  $('#confirmModal').classList.remove('hidden');
+}
+
+async function confirmDelete() {
+  const s = state.pendingDelete; if (!s) return;
+  $('#btnConfirmDelete').disabled = true;
+  try {
+    await DB.from('student_question_attempts').delete().eq('student_id', s.national_id);
+    const { error } = await DB.from('students').delete().eq('national_id', s.national_id);
+    if (error) throw error;
+    toast('🗑️ تم حذف الطالب', 'success'); $('#confirmModal').classList.add('hidden'); state.pendingDelete = null; await loadStudents();
+  } catch (e) { toast('فشل الحذف: ' + (e.message || e), 'error', 5000); }
+  finally { $('#btnConfirmDelete').disabled = false; }
+}
+
+async function loadQuestionsTab() {
+  const t = state.teacher; if (!t) return;
+  const hint = $('#questionsPermHint'), btnMgr = $('#btnManageQuestions');
+  if (t.can_add_questions) { hint.innerHTML = '✅ أنت مصرّح بإضافة وتعديل أسئلتك.'; hint.style.color = '#1e7e34'; btnMgr.disabled = false; }
+  else { hint.innerHTML = '⛔ لا تملك صلاحية إضافة الأسئلة حالياً.'; hint.style.color = '#c0392b'; btnMgr.disabled = true; }
+  try {
+    const { data: qs, error } = await DB.from('questions').select('id, subject, branch, topic, difficulty, is_active, created_at').eq('added_by_id', t.national_id).eq('added_by_role', 'teacher').order('created_at', { ascending: false });
+    if (error) throw error;
+    const all = qs || [];
+    $('#questionStats').innerHTML = `
+      <div class="stat-card"><div class="val">${all.length}</div><div class="lbl">إجمالي الأسئلة</div></div>
+      <div class="stat-card green"><div class="val">${all.filter(q => q.is_active).length}</div><div class="lbl">نشطة</div></div>
+      <div class="stat-card gold"><div class="val">${all.filter(q => q.subject === 'رياضيات').length}</div><div class="lbl">رياضيات</div></div>
+      <div class="stat-card green"><div class="val">${all.filter(q => q.subject === 'علوم').length}</div><div class="lbl">علوم</div></div>
+    `;
+    const recent = all.slice(0, 10), body = $('#recentQuestionsBody');
+    if (!recent.length) body.innerHTML = '<tr class="empty-row"><td colspan="7">لا توجد أسئلة بعد</td></tr>';
+    else body.innerHTML = recent.map((q, i) => `
+      <tr><td>${i + 1}</td><td>${esc(q.subject)}</td><td>${esc(q.branch || '—')}</td><td>${esc(q.topic || '—')}</td><td>${diffBadge(q.difficulty)}</td><td>${q.is_active ? '✅ نشط' : '⛔ معطّل'}</td><td>${new Date(q.created_at).toLocaleDateString('ar-EG')}</td></tr>
+    `).join('');
+  } catch (e) { toast('فشل تحميل الأسئلة: ' + e.message, 'error'); }
+}
+
+function diffBadge(d) {
+  if (d === 'EASY') return '<span class="diff-easy">سهل</span>';
+  if (d === 'MEDIUM') return '<span class="diff-medium">متوسط</span>';
+  if (d === 'HARD') return '<span class="diff-hard">صعب</span>';
+  return esc(d || '—');
+}
+
+let reportLoaded = false;
+async function loadReports(force = false) {
+  if (reportLoaded && !force) return; reportLoaded = true;
+  $('#reportSubjectLabel').textContent = state.teacher.subject || '(كل المواد)';
+  if (!state.students.length) await loadStudents();
+  try {
+    const attempts = await fetchAttemptsForStudents(state.students.map(s => s.national_id), state.teacher.subject);
+    state.reportAttempts = attempts;
+    renderSchoolSummary(attempts); renderSectionsReport(attempts); renderBreakdowns(attempts);
+  } catch (e) { toast('فشل تحميل التقارير: ' + e.message, 'error', 5000); }
+}
+
+async function fetchAttemptsForStudents(studentIds, subject) {
+  if (!studentIds.length) return [];
+  const CHUNK = 50; let all = [];
+  for (let i = 0; i < studentIds.length; i += CHUNK) {
+    let q = DB.from('student_question_attempts').select('student_id, question_id, is_correct, score, subject, branch, cognitive, difficulty, updated_at').in('student_id', studentIds.slice(i, i + CHUNK));
+    if (subject) q = q.eq('subject', subject);
+    const { data, error } = await q; if (error) throw error; all = all.concat(data || []);
+  }
+  return all;
+}
+
+function renderSchoolSummary(attempts) {
+  const totalAttempts = attempts.length, correct = attempts.filter(a => a.is_correct).length;
+  const accuracy = totalAttempts ? (correct / totalAttempts * 100) : 0;
+  const avgScore = totalAttempts ? attempts.reduce((s, a) => s + (Number(a.score) || 0), 0) / totalAttempts : 0;
+  $('#schoolSummaryStats').innerHTML = `
+    <div class="stat-card"><div class="val">${state.students.length}</div><div class="lbl">إجمالي الطلاب</div></div>
+    <div class="stat-card"><div class="val">${new Set(attempts.map(a => a.student_id)).size}</div><div class="lbl">طلاب شاركوا</div></div>
+    <div class="stat-card"><div class="val">${totalAttempts}</div><div class="lbl">إجمالي المحاولات</div></div>
+    <div class="stat-card green"><div class="val">${accuracy.toFixed(1)}%</div><div class="lbl">نسبة الصواب</div></div>
+    <div class="stat-card gold"><div class="val">${avgScore.toFixed(2)}</div><div class="lbl">متوسط الدرجة</div></div>
+  `;
+}
+
+function renderSectionsReport(attempts) {
+  const groups = {};
+  state.students.forEach(s => {
+    const k = `${s.grade || '—'}||${s.section || '—'}`;
+    if (!groups[k]) groups[k] = { grade: s.grade || '—', section: s.section || '—', ids: [] };
+    groups[k].ids.push(s.national_id);
+  });
+  const attemptsById = {}; attempts.forEach(a => { (attemptsById[a.student_id] ||= []).push(a); });
+  const rows = Object.values(groups).map(g => {
+    const att = g.ids.flatMap(id => attemptsById[id] || []);
+    const total = att.length, correct = att.filter(a => a.is_correct).length;
+    return { ...g, total, acc: total ? (correct / total * 100) : 0, avg: total ? att.reduce((s, a) => s + (Number(a.score) || 0), 0) / total : 0 };
+  }).sort((a, b) => a.grade.localeCompare(b.grade) || a.section.localeCompare(b.section));
+  const body = $('#sectionsReportBody');
+  if (!rows.length) body.innerHTML = '<tr class="empty-row"><td colspan="6">لا توجد شعب</td></tr>';
+  else body.innerHTML = rows.map(r => `
+    <tr><td>${esc(r.grade)}</td><td>${esc(r.section)}</td><td>${r.ids.length}</td><td>${r.total}</td><td>${r.total ? r.acc.toFixed(1) + '%' : '—'}</td><td>${r.total ? r.avg.toFixed(2) : '—'}</td></tr>
+  `).join('');
+}
+
+function renderBreakdowns(attempts) {
+  const agg = (key) => { const map = {}; attempts.forEach(a => { const k = a[key] || '—'; map[k] ||= { n: 0, c: 0 }; map[k].n++; if (a.is_correct) map[k].c++; }); return map; };
+  const diffMap = agg('difficulty'), cogMap = agg('cognitive');
+  $('#difficultyBreakdownBody').innerHTML = ['EASY','MEDIUM','HARD'].map(k => {
+    const v = diffMap[k] || { n: 0, c: 0 }; return `<tr><td>${k}</td><td>${v.n}</td><td>${v.n ? (v.c/v.n*100).toFixed(1)+'%' : '—'}</td></tr>`;
+  }).join('');
+  $('#cognitiveBreakdownBody').innerHTML = ['KNOWING','APPLYING','REASONING'].map(k => {
+    const v = cogMap[k] || { n: 0, c: 0 }; return `<tr><td>${k}</td><td>${v.n}</td><td>${v.n ? (v.c/v.n*100).toFixed(1)+'%' : '—'}</td></tr>`;
+  }).join('');
+}
+
+function fillReportStudentSelect() {
+  const sel = $('#reportStudentSelect'), current = sel.value;
+  sel.innerHTML = '<option value="">— اختر طالباً —</option>' + state.students.map(s => `<option value="${esc(s.national_id)}">${esc(s.full_name)} (#${esc(s.national_id)})</option>`).join('');
+  sel.value = current;
+}
+
+async function openStudentReport(nationalId) {
+  const s = state.students.find(x => x.national_id === nationalId); if (!s) return;
+  showLoading();
+  try {
+    let q = DB.from('student_question_attempts').select('*').eq('student_id', nationalId);
+    if (state.teacher.subject) q = q.eq('subject', state.teacher.subject);
+    const { data, error } = await q.order('updated_at', { ascending: false }); if (error) throw error;
+    const attempts = data || [];
+    const total = attempts.length, correct = attempts.filter(a => a.is_correct).length, acc = total ? (correct / total * 100) : 0;
+    $('#srTitle').textContent = '📊 تقرير الطالب: ' + s.full_name;
+    $('#srMeta').innerHTML = `الصف: <b>${esc(s.grade)}</b> • الشعبة: <b>${esc(s.section)}</b> • الرقم: <b>${esc(s.national_id)}</b>`;
+    $('#srStats').innerHTML = `
+      <div class="stat-card"><div class="val">${total}</div><div class="lbl">محاولات</div></div>
+      <div class="stat-card green"><div class="val">${correct}</div><div class="lbl">صحيحة</div></div>
+      <div class="stat-card green"><div class="val">${acc.toFixed(1)}%</div><div class="lbl">نسبة الصواب</div></div>
+    `;
+    $('#studentReportModal').classList.remove('hidden');
+  } catch (e) { toast('فشل تحميل تقرير الطالب: ' + e.message, 'error', 5000); }
+  finally { hideLoading(); }
+}
+
+function renderProfile() {
+  const t = state.teacher, s = state.school;
+  $('#profFullName').value = t.full_name || ''; $('#profNationalId').value = t.national_id || '';
+  $('#profSchool').value = s ? `${s.school_name} (#${s.national_code})` : `#${t.school_id}`;
+  $('#profSubject').value = t.subject || ''; $('#profPhone').value = t.phone || '';
+}
+
+async function saveProfile() {
+  const phone = $('#profPhone').value.trim();
+  if (phone && !/^[0-9+\- ]{6,15}$/.test(phone)) { toast('رقم الهاتف غير صالح', 'error'); return; }
+  $('#btnSaveProfile').disabled = true;
+  try {
+    const { error } = await DB.from('teachers').update({ phone: phone || null }).eq('national_id', state.teacher.national_id);
+    if (error) throw error;
+    state.teacher.phone = phone || null; toast('✅ تم تحديث رقم الهاتف', 'success');
+  } catch (e) { toast('فشل الحفظ: ' + e.message, 'error', 5000); }
+  finally { $('#btnSaveProfile').disabled = false; }
+}
+
+// ==========================================
+// دوال الطباعة والتصدير للمعلم (الجديدة)
+// ==========================================
+function printTeacherReport() {
+  if (!state.students.length) { toast('لا توجد بيانات لطباعتها', 'warning'); return; }
+  const w = window.open('', '_blank');
+  let html = `
+    <html dir="rtl"><head><title>تقرير المعلم - ${state.teacher.full_name}</title>
+    <style>body{font-family:Tahoma; padding:20px;} h1{color:#1a3a5c;} table{width:100%; border-collapse:collapse; margin-top:20px;} th,td{border:1px solid #ccc; padding:8px; text-align:right;} th{background:#f0f4f8;}</style>
+    </head><body>
+    <h1>📊 تقرير أداء الطلاب - المادة: ${state.teacher.subject}</h1>
+    <p><b>المعلم:</b> ${state.teacher.full_name} | <b>المدرسة:</b> ${state.school ? state.school.school_name : ''}</p>
+    <table>
+      <thead><tr><th>الرقم الوطني</th><th>اسم الطالب</th><th>الصف</th><th>الشعبة</th><th>المحاولات</th><th>صحيحة</th><th>خاطئة</th></tr></thead>
+      <tbody>
+  `;
+  state.students.forEach(s => {
+    const att = (state.reportAttempts || []).filter(a => a.student_id === s.national_id);
+    const correct = att.filter(a => a.is_correct).length;
+    html += `<tr>
+      <td>${s.national_id}</td><td>${s.full_name}</td><td>${s.grade}</td><td>${s.section}</td>
+      <td>${att.length}</td><td style="color:green">${correct}</td><td style="color:red">${att.length - correct}</td>
+    </tr>`;
+  });
+  html += `</tbody></table><script>window.onload=function(){window.print();}<\/script></body></html>`;
+  w.document.write(html); w.document.close();
+}
+
+function exportTeacherCSV() {
+  if (!state.students.length) { toast('لا توجد بيانات لتصديرها', 'warning'); return; }
+  let csvContent = '\uFEFF';
+  csvContent += 'الرقم الوطني,اسم الطالب,الصف,الشعبة,عدد المحاولات,صحيحة,خاطئة\n';
+  
+  state.students.forEach(s => {
+    const att = (state.reportAttempts || []).filter(a => a.student_id === s.national_id);
+    const correct = att.filter(a => a.is_correct).length;
+    csvContent += `"${s.national_id}","${s.full_name}","${s.grade}","${s.section}","${att.length}","${correct}","${att.length - correct}"\n`;
+  });
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = `تقرير_المعلم_${state.teacher.full_name}.csv`;
+  document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+  toast('✅ تم تصدير الملف بنجاح', 'success');
+}
+
+function bindEvents() {
+  $('#studentSearch').addEventListener('input', renderStudents);
+  $('#gradeFilter').addEventListener('change', renderStudents);
+  $('#sectionFilter').addEventListener('change', renderStudents);
+  $('#btnAddStudent').addEventListener('click', openAddStudent);
+  $('#btnCancelStudent').addEventListener('click', closeStudentModal);
+  $('#studentForm').addEventListener('submit', saveStudent);
+  $('#btnCancelConfirm').addEventListener('click', () => { $('#confirmModal').classList.add('hidden'); state.pendingDelete = null; });
+  $('#btnConfirmDelete').addEventListener('click', confirmDelete);
+  $('#btnManageQuestions').addEventListener('click', () => { if (!state.teacher.can_add_questions) { toast('لا تملك صلاحية إضافة الأسئلة', 'warning'); return; } location.href = 'questions-manager.html'; });
+  $('#btnRefreshQuestions').addEventListener('click', loadQuestionsTab);
+  $('#btnRefreshReports').addEventListener('click', () => loadReports(true));
+  $('#btnShowStudentReport').addEventListener('click', () => { const id = $('#reportStudentSelect').value; if (!id) { toast('اختر طالباً أولاً', 'warning'); return; } openStudentReport(id); });
+  $('#btnCloseSr').addEventListener('click', () => $('#studentReportModal').classList.add('hidden'));
+  $('#btnSaveProfile').addEventListener('click', saveProfile);
+  $('#btnResetProfile').addEventListener('click', () => { renderProfile(); toast('تمت استعادة القيم الأصلية', 'info'); });
+  document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; $('#studentModal').classList.add('hidden'); $('#confirmModal').classList.add('hidden'); $('#studentReportModal').classList.add('hidden'); });
+  ['studentModal', 'confirmModal', 'studentReportModal'].forEach(id => { $('#' + id).addEventListener('click', (e) => { if (e.target.id === id) $('#' + id).classList.add('hidden'); }); });
+}
+
+(async function main() {
+  try {
+    if (!DB) throw new Error('لم يتم تحميل عميل Supabase.');
+    const ok = await initAuth(); if (!ok) return;
+    await loadTeacherData(); renderHeader(); renderProfile(); setupTabs(); bindEvents();
+    await loadStudents();
+    hideLoading(); $('#mainContainer').classList.remove('hidden');
+    loadQuestionsTab().catch(err => console.warn('questions preload:', err.message));
+  } catch (e) {
+    console.error(e); hideLoading();
+    document.body.innerHTML = `<div class="container" style="max-width:640px; margin:60px auto; padding:40px; text-align:center; color:#c0392b;"><h2>⚠️ خطأ في التحميل</h2><p>${esc(e.message || e)}</p><button onclick="location.href='index.html'" class="btn btn-primary" style="margin-top:20px;">العودة للدخول</button></div>`;
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقارير — TIMSS 2027</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', 'Tahoma', sans-serif; background: linear-gradient(135deg, #1a3a5c, #2c5f8a, #1e4d73); min-height: 100vh; padding: 20px 14px; color: #1a3a5c; }
+  .container { max-width: 1300px; margin: 0 auto; }
+  .top-card { background: #fff; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.35); overflow: hidden; margin-bottom: 16px; }
+  .top-header { background: linear-gradient(135deg, #1a3a5c, #2c5f8a); color: #fff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .top-header h1 { font-size: 20px; }
+  .subtitle { font-size: 12px; opacity: .85; margin-top: 3px; }
+  .badge-version { background: rgba(255,255,255,.18); padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .user-block { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .user-info { text-align: left; }
+  .user-info .name { font-weight: 700; font-size: 14px; }
+  .user-info .meta { font-size: 11px; opacity: .85; }
+  .btn { padding: 9px 16px; border: none; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: .2s; display: inline-flex; align-items: center; gap: 5px; }
+  .btn-primary { background: linear-gradient(135deg, #1a3a5c, #2c5f8a); color: #fff; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,58,92,.35); }
+  .btn-ghost { background: #eaf1f9; color: #1a3a5c; }
+  .btn-ghost:hover { background: #d8e6f3; }
+  .btn-logout { background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.4); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 600; }
+  .btn-logout:hover { background: rgba(255,255,255,.28); }
+  .tabs { display: flex; background: #f0f4f9; border-bottom: 2px solid #d8e2ec; padding: 0 12px; gap: 4px; overflow-x: auto; }
+  .tab { padding: 14px 22px; cursor: pointer; font-weight: 600; font-size: 14px; color: #6b7c8f; border-bottom: 3px solid transparent; transition: .2s; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+  .tab:hover { color: #2c5f8a; }
+  .tab.active { color: #1a3a5c; border-bottom-color: #2c5f8a; background: #fff; }
+  .panel { display: none; padding: 20px 24px; background: #fff; }
+  .panel.active { display: block; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .stat-card { background: linear-gradient(135deg, #f5f8fc, #eaf1f9); border: 1px solid #d8e2ec; border-radius: 10px; padding: 16px; text-align: center; }
+  .stat-value { font-size: 26px; font-weight: 800; color: #2c5f8a; }
+  .stat-label { font-size: 12px; color: #6b7c8f; margin-top: 4px; font-weight: 600; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .search-input, .filter-select { padding: 10px 12px; border: 2px solid #d8e2ec; border-radius: 8px; font-family: inherit; font-size: 13px; background: #fff; }
+  .search-input { flex: 1; min-width: 220px; }
+  .search-input:focus, .filter-select:focus { outline: none; border-color: #2c5f8a; box-shadow: 0 0 0 3px rgba(44,95,138,.12); }
+  .table-wrap { border: 1px solid #d8e2ec; border-radius: 10px; overflow: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead { background: #f0f4f9; }
+  th { padding: 11px 12px; text-align: right; font-weight: 700; color: #1a3a5c; font-size: 12px; border-bottom: 2px solid #d8e2ec; white-space: nowrap; }
+  td { padding: 10px 12px; border-bottom: 1px solid #eef3f8; }
+  tbody tr:hover { background: #f9fbfd; }
+  tbody tr:last-child td { border-bottom: none; }
+  .empty-state { text-align: center; padding: 30px 20px; color: #6b7c8f; font-size: 14px; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+  .tag-yes { background: #d4edda; color: #1e7e34; }
+  .tag-no { background: #f8d7da; color: #c0392b; }
+  .tag-warn { background: #fff3cd; color: #b8860b; }
+  .tag-info { background: #d1ecf1; color: #1a5276; }
+  .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .toast { padding: 11px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,.2); animation: slideDown .3s ease; max-width: 90vw; }
+  .toast.success { background: #d4edda; color: #1e7e34; border: 1.5px solid #1e7e34; }
+  .toast.error { background: #f8d7da; color: #c0392b; border: 1.5px solid #c0392b; }
+  .toast.info { background: #d1ecf1; color: #1a5276; border: 1.5px solid #1a5276; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+  .loading-overlay { position: fixed; inset: 0; background: rgba(26,58,92,.75); display: flex; align-items: center; justify-content: center; z-index: 3000; color: #fff; flex-direction: column; gap: 16px; font-weight: 600; }
+  .spinner { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,.25); border-top-color: #fff; border-radius: 50%; animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay.hidden { display: none; }
+  .progress-bar { height: 8px; background: #eaf1f9; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #2c5f8a, #1a3a5c); border-radius: 4px; transition: width .4s; }
+  .progress-fill.good { background: linear-gradient(90deg, #1e7e34, #28a745); }
+  .progress-fill.warn { background: linear-gradient(90deg, #b8860b, #ffc107); }
+  .progress-fill.bad { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+  .info-box { background: #f5f8fc; border: 1px solid #d8e2ec; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px; color: #1a3a5c; }
+  .info-box strong { color: #2c5f8a; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .tabs, .toolbar, .top-header .user-block, .top-header .badge-version, .btn { display: none !important; }
+    .top-card { box-shadow: none; border-radius: 0; }
+    .panel { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div>جارٍ التحميل...</div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="container">
+  <div class="top-card">
+    <div class="top-header">
+      <div>
+        <h1>📊 التقارير والتحليلات <span class="badge-version">TIMSS 2027</span></h1>
+        <div class="subtitle">تقارير المدرسة والشعبة والمعلم والطالب</div>
+      </div>
+      <div class="user-block">
+        <div class="user-info">
+          <div class="name" data-user-name>—</div>
+          <div class="meta" id="userMeta">—</div>
+        </div>
+        <button class="btn-logout" id="btnBack">← رجوع</button>
+        <button class="btn-logout" data-logout>🚪 خروج</button>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabsContainer"></div>
+  </div>
+
+  <div class="panel" id="panel-school">
+    <div class="toolbar">
+      <select class="filter-select" id="schoolPicker" style="min-width:280px;">
+        <option value="">— اختر المدرسة —</option>
+      </select>
+      <button class="btn btn-ghost" id="btnPrintSchool">🖨️ طباعة</button>
+      <button class="btn btn-ghost" id="btnExportSchool">⬇️ CSV</button>
+    </div>
+    <div id="schoolReport">
+      <div class="empty-state">اختر مدرسة لعرض التقرير</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-section">
+    <div class="toolbar">
+      <select class="filter-select" id="sectionSchoolPicker" style="min-width:240px;">
+        <option value="">— اختر المدرسة —</option>
+      </select>
+      <select class="filter-select" id="sectionPicker" style="min-width:220px;">
+        <option value="">— اختر الشعبة —</option>
+      </select>
+      <button class="btn btn-ghost" id="btnPrintSection">🖨️ طباعة</button>
+      <button class="btn btn-ghost" id="btnExportSection">⬇️ CSV</button>
+    </div>
+    <div id="sectionReport">
+      <div class="empty-state">اختر مدرسة ثم شعبة لعرض التقرير</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-teacher">
+    <div class="toolbar">
+      <select class="filter-select" id="teacherSchoolPicker" style="min-width:240px;">
+        <option value="">— اختر المدرسة —</option>
+      </select>
+      <select class="filter-select" id="teacherPicker" style="min-width:240px;">
+        <option value="">— اختر المعلم —</option>
+      </select>
+      <button class="btn btn-ghost" id="btnPrintTeacher">🖨️ طباعة</button>
+      <button class="btn btn-ghost" id="btnExportTeacher">⬇️ CSV</button>
+    </div>
+    <div id="teacherReport">
+      <div class="empty-state">اختر معلم لعرض التقرير</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-student">
+    <div class="toolbar">
+      <select class="filter-select" id="studentSchoolPicker" style="min-width:240px;">
+        <option value="">— اختر المدرسة —</option>
+      </select>
+      <select class="filter-select" id="studentPicker" style="min-width:240px;">
+        <option value="">— اختر الطالب —</option>
+      </select>
+      <button class="btn btn-ghost" id="btnPrintStudent">🖨️ طباعة</button>
+      <button class="btn btn-ghost" id="btnExportStudent">⬇️ CSV</button>
+    </div>
+    <div id="studentReport">
+      <div class="empty-state">اختر طالب لعرض التقرير</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+<script>
+(async function () {
+  'use strict';
+
+  const DB = (window.supabaseClient && typeof window.supabaseClient.from === 'function') ? window.supabaseClient
+           : (window.supabase && typeof window.supabase.from === 'function') ? window.supabase
+           : window.db;
+  if (!DB) { alert('فشل تحميل عميل Supabase'); return; }
+
+  const session = (window.auth && auth.getSession) ? auth.getSession() : null;
+  if (!session || !['admin','supervisor','teacher','student'].includes(session.role)) {
+    location.href = 'index.html'; return;
+  }
+
+  const state = {
+    session,
+    role: session.role,
+    nationalId: String(session.national_id ?? session.nationalId ?? ''),
+    name: session.full_name || session.name || 'مستخدم',
+    directorateId: session.directorate_id ?? session.directorateId
+                   ?? session.directorate ?? session.dir_id ?? session.dir ?? null,
+    schools: [],
+    currentTables: {}
+  };
+
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+  function toast(msg, type='info', ms=3000) {
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = msg;
+    $('#toastContainer').appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); }, ms);
+  }
+  function hideLoading() { $('#loading').classList.add('hidden'); }
+
+  function renderHeader() {
+    document.querySelector('[data-user-name]').textContent = state.name;
+    const roleAr = { admin:'أدمن', supervisor:'مشرف', teacher:'معلم', student:'طالب' }[state.role] || state.role;
+    $('#userMeta').textContent = `${roleAr} • ${state.nationalId}`;
+  }
+  function backTarget() {
+    return { admin:'admin.html', supervisor:'supervisor.html', teacher:'teacher.html', student:'student.html' }[state.role] || 'index.html';
+  }
+  $('#btnBack').addEventListener('click', () => location.href = backTarget());
+
+  // ===== تحميل المدارس المتاحة (محسّن مع fallback) =====
+  async function loadAccessibleSchools() {
+    console.log('🔍 loadAccessibleSchools — role:', state.role, '| directorateId:', state.directorateId);
+
+    if (state.role === 'admin') {
+      const { data, error } = await DB.from('schools').select('*').order('school_name');
+      if (error) console.error('admin schools error:', error);
+      return data || [];
+    }
+
+    if (state.role === 'supervisor') {
+      // محاولة 1: فلترة بالمديرية
+      if (state.directorateId != null) {
+        const { data, error } = await DB.from('schools')
+          .select('*')
+          .eq('directorate_id', state.directorateId)
+          .order('school_name');
+        if (!error && data && data.length > 0) {
+          console.log('✓ supervisor schools loaded (filtered):', data.length);
+          return data;
+        }
+        if (error) console.warn('⚠️ directorate filter error:', error.message);
+        else console.warn('⚠️ directorate filter returned 0 — trying without filter');
+      }
+      // fallback: تحميل الكل
+      console.warn('⚠️ directorateId null or empty — loading ALL schools');
+      const { data, error } = await DB.from('schools').select('*').order('school_name');
+      if (error) console.error('supervisor schools (all) error:', error);
+      console.log('✓ supervisor schools loaded (all):', (data || []).length);
+      return data || [];
+    }
+
+    if (state.role === 'teacher') {
+      const { data: t } = await DB.from('teachers').select('school_id').eq('national_id', state.nationalId).maybeSingle();
+      if (!t) return [];
+      const { data } = await DB.from('schools').select('*').eq('national_code', t.school_id);
+      return data || [];
+    }
+    if (state.role === 'student') {
+      const { data: s } = await DB.from('students').select('school_id').eq('national_id', state.nationalId).maybeSingle();
+      if (!s) return [];
+      const { data } = await DB.from('schools').select('*').eq('national_code', s.school_id);
+      return data || [];
+    }
+    return [];
+  }
+
+  function fillSchoolPickers() {
+    const opts = '<option value="">— اختر المدرسة —</option>' +
+      state.schools.map(s => `<option value="${esc(s.national_code)}">${esc(s.school_name)}</option>`).join('');
+    ['#schoolPicker', '#sectionSchoolPicker', '#teacherSchoolPicker', '#studentSchoolPicker'].forEach(sel => {
+      const el = $(sel);
+      if (el) el.innerHTML = opts;
+    });
+  }
+
+  function buildTabs() {
+    const tabs = [];
+    if (state.role !== 'student') {
+      tabs.push({ id:'school', label:'🏫 تقرير مدرسة' });
+      tabs.push({ id:'section', label:'👥 تقرير شعبة' });
+      tabs.push({ id:'teacher', label:'👨‍🏫 تقرير معلم' });
+    }
+    tabs.push({ id:'student', label:'🎓 تقرير طالب' });
+
+    const container = $('#tabsContainer');
+    container.innerHTML = tabs.map((t, i) =>
+      `<button class="tab ${i===0?'active':''}" data-tab="${t.id}">${t.label}</button>`
+    ).join('');
+
+    $$('.panel').forEach(p => p.classList.remove('active'));
+    const first = tabs[0].id;
+    $('#panel-' + first).classList.add('active');
+
+    $$('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        $$('.tab').forEach(t => t.classList.remove('active'));
+        $$('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        $('#panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+  }
+
+  function setExportData(panelId, headers, rows) {
+    state.currentTables[panelId] = { headers, rows };
+  }
+  function exportCSV(panelId, filename) {
+    const t = state.currentTables[panelId];
+    if (!t) { toast('لا توجد بيانات للتصدير', 'error'); return; }
+    const csv = [t.headers.join(','), ...t.rows.map(r => r.map(c => `"${String(c??'').replace(/"/g,'""')}"`).join(','))].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('تم التصدير ✓', 'success');
+  }
+
+  function pct(correct, total) {
+    if (!total) return '—';
+    return ((correct / total) * 100).toFixed(1) + '%';
+  }
+  function progressClass(percentage) {
+    if (percentage >= 75) return 'good';
+    if (percentage >= 50) return 'warn';
+    return 'bad';
+  }
+  function formatDate(d) {
+    if (!d) return '—';
+    try {
+      const dt = new Date(d);
+      return dt.toLocaleString('ar-EG', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+    } catch { return String(d); }
+  }
+
+  // ===== تقرير المدرسة =====
+  async function loadSchoolReport(schoolCode) {
+    if (!schoolCode) {
+      $('#schoolReport').innerHTML = '<div class="empty-state">اختر مدرسة لعرض التقرير</div>';
+      return;
+    }
+    $('#schoolReport').innerHTML = '<div class="empty-state">جارٍ التحميل...</div>';
+    try {
+      const { data: students, error: sErr } = await DB.from('students')
+        .select('national_id, full_name, grade, section')
+        .eq('school_id', Number(schoolCode));
+      if (sErr) throw new Error('students: ' + sErr.message);
+
+      const studentIds = (students || []).map(s => s.national_id);
+
+      const { data: teachers, error: tErr } = await DB.from('teachers')
+        .select('national_id, full_name, can_add_questions')
+        .eq('school_id', Number(schoolCode));
+      if (tErr) throw new Error('teachers: ' + tErr.message);
+
+      const teacherIds = (teachers || []).map(t => String(t.national_id));
+
+      let questions = [];
+      if (teacherIds.length) {
+        const { data } = await DB.from('questions').select('id, subject, is_active, added_by_id').in('added_by_id', teacherIds);
+        questions = data || [];
+      }
+
+      let attempts = [];
+      if (studentIds.length > 0) {
+        const { data } = await DB.from('student_question_attempts').select('*').in('student_id', studentIds.slice(0, 1000));
+        attempts = data || [];
+      }
+
+      const totalAttempts = attempts.length;
+      const correctAttempts = attempts.filter(a => a.is_correct).length;
+      const accuracy = pct(correctAttempts, totalAttempts);
+      const avgScore = totalAttempts
+        ? (attempts.reduce((s, a) => s + (Number(a.score) || 0), 0) / totalAttempts).toFixed(2)
+        : '—';
+
+      const mathQ = questions.filter(q => q.subject === 'رياضيات').length;
+      const sciQ = questions.filter(q => q.subject === 'علوم').length;
+      const activeQ = questions.filter(q => q.is_active).length;
+
+      const secMap = {};
+      (students || []).forEach(s => {
+        const key = `${s.grade || '—'}|${s.section || '—'}`;
+        if (!secMap[key]) secMap[key] = { grade: s.grade, section: s.section, students: [] };
+        secMap[key].students.push(s.national_id);
+      });
+
+      const sectionRows = Object.values(secMap).map(g => {
+        const sids = g.students.map(String);
+        const secAttempts = attempts.filter(a => sids.includes(String(a.student_id)));
+        const secCorrect = secAttempts.filter(a => a.is_correct).length;
+        const secAcc = pct(secCorrect, secAttempts.length);
+        const secAvg = secAttempts.length
+          ? (secAttempts.reduce((s, a) => s + (Number(a.score) || 0), 0) / secAttempts.length).toFixed(2)
+          : '—';
+        return {
+          grade: g.grade || '—',
+          section: g.section || '—',
+          studentsCount: g.students.length,
+          attempts: secAttempts.length,
+          accuracy: secAcc,
+          avgScore: secAvg,
+          accNum: secAttempts.length ? (secCorrect / secAttempts.length * 100) : 0
+        };
+      }).sort((a, b) => (a.grade || '').localeCompare(b.grade || '') || (a.section || '').localeCompare(b.section || ''));
+
+      const schoolName = state.schools.find(x => String(x.national_code) === String(schoolCode))?.school_name || 'مدرسة';
+
+      const html = `
+        <div class="info-box">
+          <strong>${esc(schoolName)}</strong>
+          • الرقم: ${esc(schoolCode)}
+          • ${students?.length || 0} طالب • ${teachers?.length || 0} معلم
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-value">${students?.length || 0}</div><div class="stat-label">عدد الطلاب</div></div>
+          <div class="stat-card"><div class="stat-value">${teachers?.length || 0}</div><div class="stat-label">عدد المعلمين</div></div>
+          <div class="stat-card"><div class="stat-value">${questions.length}</div><div class="stat-label">أسئلة المعلمين</div></div>
+          <div class="stat-card"><div class="stat-value">${activeQ}</div><div class="stat-label">منها نشطة</div></div>
+          <div class="stat-card"><div class="stat-value">${totalAttempts}</div><div class="stat-label">إجمالي المحاولات</div></div>
+          <div class="stat-card"><div class="stat-value">${accuracy}</div><div class="stat-label">نسبة الصواب</div></div>
+          <div class="stat-card"><div class="stat-value">${avgScore}</div><div class="stat-label">متوسط النقاط</div></div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <h3 style="font-size:15px; margin-bottom:10px; color:#1a3a5c;">📚 توزيع الأسئلة</h3>
+            <div class="info-box" style="padding:14px;">
+              <div style="margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+                  <span>رياضيات</span><strong>${mathQ}</strong>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:${questions.length ? (mathQ/questions.length*100) : 0}%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+                  <span>علوم</span><strong>${sciQ}</strong>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:${questions.length ? (sciQ/questions.length*100) : 0}%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 style="font-size:15px; margin-bottom:10px; color:#1a3a5c;">👥 توزيع الطلاب</h3>
+            <div class="info-box" style="padding:14px;">
+              <div style="font-size:13px; color:#1a3a5c;">
+                عدد الشعب: <strong>${sectionRows.length}</strong><br>
+                متوسط الطلاب/شعبة: <strong>${sectionRows.length ? (students?.length / sectionRows.length).toFixed(1) : '—'}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-size:15px; margin:16px 0 10px; color:#1a3a5c;">📋 تفصيل الشعب</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>الصف</th>
+                <th>الشعبة</th>
+                <th>عدد الطلاب</th>
+                <th>عدد المحاولات</th>
+                <th>نسبة الصواب</th>
+                <th>متوسط النقاط</th>
+                <th>المستوى</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sectionRows.length === 0
+                ? '<tr><td colspan="7"><div class="empty-state">لا توجد شعب مسجلة</div></td></tr>'
+                : sectionRows.map(s => `
+                  <tr>
+                    <td>${esc(s.grade)}</td>
+                    <td>${esc(s.section)}</td>
+                    <td>${s.studentsCount}</td>
+                    <td>${s.attempts}</td>
+                    <td>${s.accuracy}</td>
+                    <td>${s.avgScore}</td>
+                    <td>
+                      <div class="progress-bar" style="width:100px;">
+                        <div class="progress-fill ${progressClass(s.accNum)}" style="width:${s.accNum}%"></div>
+                      </div>
+                    </td>
+                  </tr>`).join('')
+              }
+            </tbody>
+          </table>
+        </div>
+      `;
+      $('#schoolReport').innerHTML = html;
+
+      setExportData('school',
+        ['الصف','الشعبة','عدد الطلاب','عدد المحاولات','نسبة الصواب','متوسط النقاط'],
+        sectionRows.map(s => [s.grade, s.section, s.studentsCount, s.attempts, s.accuracy, s.avgScore])
+      );
+    } catch (e) {
+      console.error(e);
+      $('#schoolReport').innerHTML = `<div class="empty-state" style="color:#c0392b;">خطأ: ${esc(e.message || e)}</div>`;
+    }
+  }
+
+  // ===== تقرير الشعبة =====
+  async function loadSectionsForSchool(schoolCode) {
+    const picker = $('#sectionPicker');
+    picker.innerHTML = '<option value="">— اختر الشعبة —</option>';
+    if (!schoolCode) return;
+
+    const { data: students } = await DB.from('students').select('grade, section').eq('school_id', Number(schoolCode));
+    const set = new Set((students || []).map(s => `${s.grade || '—'}|${s.section || '—'}`));
+    const opts = Array.from(set).sort().map(k => {
+      const [g, sec] = k.split('|');
+      return `<option value="${esc(k)}">${esc(g)} — شعبة ${esc(sec)}</option>`;
+    }).join('');
+    picker.innerHTML = '<option value="">— اختر الشعبة —</option>' + opts;
+  }
+
+  async function loadSectionReport(schoolCode, sectionKey) {
+    if (!schoolCode || !sectionKey) {
+      $('#sectionReport').innerHTML = '<div class="empty-state">اختر مدرسة ثم شعبة لعرض التقرير</div>';
+      return;
+    }
+    $('#sectionReport').innerHTML = '<div class="empty-state">جارٍ التحميل...</div>';
+    try {
+      const [grade, section] = sectionKey.split('|');
+      const { data: allStudents } = await DB.from('students').select('national_id, full_name, grade, section').eq('school_id', Number(schoolCode));
+      const students = (allStudents || []).filter(s =>
+        String(s.grade || '—') === String(grade) && String(s.section || '—') === String(section)
+      );
+      const studentIds = students.map(s => s.national_id);
+
+      let attempts = [];
+      if (studentIds.length > 0) {
+        const { data } = await DB.from('student_question_attempts').select('*').in('student_id', studentIds);
+        attempts = data || [];
+      }
+
+      const rows = students.map(s => {
+        const sAttempts = attempts.filter(a => String(a.student_id) === String(s.national_id));
+        const sCorrect = sAttempts.filter(a => a.is_correct).length;
+        const acc = sAttempts.length ? (sCorrect / sAttempts.length * 100) : 0;
+        const avg = sAttempts.length ? (sAttempts.reduce((x, a) => x + (Number(a.score) || 0), 0) / sAttempts.length) : 0;
+        return {
+          national_id: s.national_id,
+          full_name: s.full_name,
+          attempts: sAttempts.length,
+          correct: sCorrect,
+          accNum: acc,
+          accuracy: sAttempts.length ? acc.toFixed(1) + '%' : '—',
+          avgScore: sAttempts.length ? avg.toFixed(2) : '—'
+        };
+      }).sort((a, b) => b.accNum - a.accNum);
+
+      const totalAttempts = attempts.length;
+      const totalCorrect = attempts.filter(a => a.is_correct).length;
+      const accuracy = pct(totalCorrect, totalAttempts);
+      const avgScore = totalAttempts ? (attempts.reduce((s, a) => s + (Number(a.score) || 0), 0) / totalAttempts).toFixed(2) : '—';
+      const best = rows[0];
+      const worst = rows[rows.length - 1];
+
+      const html = `
+        <div class="info-box">
+          <strong>${esc(state.schools.find(x => String(x.national_code) === String(schoolCode))?.school_name || '')}</strong>
+          • الصف ${esc(grade)} — شعبة ${esc(section)} • ${students.length} طالب
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-value">${students.length}</div><div class="stat-label">عدد الطلاب</div></div>
+          <div class="stat-card"><div class="stat-value">${totalAttempts}</div><div class="stat-label">إجمالي المحاولات</div></div>
+          <div class="stat-card"><div class="stat-value">${accuracy}</div><div class="stat-label">نسبة الصواب</div></div>
+          <div class="stat-card"><div class="stat-value">${avgScore}</div><div class="stat-label">متوسط النقاط</div></div>
+          <div class="stat-card"><div class="stat-value">${best ? best.accuracy : '—'}</div><div class="stat-label">أعلى طالب</div></div>
+          <div class="stat-card"><div class="stat-value">${worst ? worst.accuracy : '—'}</div><div class="stat-label">أدنى طالب</div></div>
+        </div>
+
+        <h3 style="font-size:15px; margin:16px 0 10px; color:#1a3a5c;">🎓 ترتيب الطلاب</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>الرقم الوطني</th>
+                <th>اسم الطالب</th>
+                <th>المحاولات</th>
+                <th>صحيحة</th>
+                <th>نسبة الصواب</th>
+                <th>متوسط النقاط</th>
+                <th>المستوى</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.length === 0
+                ? '<tr><td colspan="8"><div class="empty-state">لا يوجد طلاب في هذه الشعبة</div></td></tr>'
+                : rows.map((r, i) => `
+                  <tr>
+                    <td>${i + 1}</td>
+                    <td>${esc(r.national_id)}</td>
+                    <td>${esc(r.full_name)}</td>
+                    <td>${r.attempts}</td>
+                    <td>${r.correct}</td>
+                    <td>${r.accuracy}</td>
+                    <td>${r.avgScore}</td>
+                    <td>
+                      <div class="progress-bar" style="width:80px;">
+                        <div class="progress-fill ${progressClass(r.accNum)}" style="width:${r.accNum}%"></div>
+                      </div>
+                    </td>
+                  </tr>`).join('')
+              }
+            </tbody>
+          </table>
+        </div>
+      `;
+      $('#sectionReport').innerHTML = html;
+
+      setExportData('section',
+        ['الرقم الوطني','اسم الطالب','المحاولات','صحيحة','نسبة الصواب','متوسط النقاط'],
+        rows.map(r => [r.national_id, r.full_name, r.attempts, r.correct, r.accuracy, r.avgScore])
+      );
+    } catch (e) {
+      console.error(e);
+      $('#sectionReport').innerHTML = `<div class="empty-state" style="color:#c0392b;">خطأ: ${esc(e.message || e)}</div>`;
+    }
+  }
+
+  // ===== تقرير المعلم =====
+  async function loadTeachersForSchool(schoolCode) {
+    const picker = $('#teacherPicker');
+    picker.innerHTML = '<option value="">— اختر المعلم —</option>';
+    if (!schoolCode) return;
+
+    const { data: teachers } = await DB.from('teachers')
+      .select('national_id, full_name')
+      .eq('school_id', Number(schoolCode))
+      .order('full_name');
+    picker.innerHTML = '<option value="">— اختر المعلم —</option>' +
+      (teachers || []).map(t => `<option value="${esc(t.national_id)}">${esc(t.full_name)}</option>`).join('');
+  }
+
+  async function loadTeacherReport(teacherId) {
+    if (!teacherId) {
+      $('#teacherReport').innerHTML = '<div class="empty-state">اختر معلم لعرض التقرير</div>';
+      return;
+    }
+    $('#teacherReport').innerHTML = '<div class="empty-state">جارٍ التحميل...</div>';
+    try {
+      const { data: teacher } = await DB.from('teachers').select('*').eq('national_id', teacherId).maybeSingle();
+      if (!teacher) {
+        $('#teacherReport').innerHTML = '<div class="empty-state">المعلم غير موجود</div>';
+        return;
+      }
+
+      const { data: questions } = await DB.from('questions').select('*').eq('added_by_id', String(teacherId)).order('created_at', { ascending: false });
+      const qList = questions || [];
+
+      const { data: students } = await DB.from('students').select('national_id').eq('school_id', teacher.school_id);
+      const studentIds = (students || []).map(s => s.national_id);
+
+      let attempts = [];
+      if (studentIds.length > 0) {
+        const { data } = await DB.from('student_question_attempts').select('*').in('student_id', studentIds);
+        attempts = data || [];
+      }
+
+      const totalQ = qList.length;
+      const activeQ = qList.filter(q => q.is_active).length;
+      const mathQ = qList.filter(q => q.subject === 'رياضيات').length;
+      const sciQ = qList.filter(q => q.subject === 'علوم').length;
+
+      const typeMap = {};
+      qList.forEach(q => { typeMap[q.question_type] = (typeMap[q.question_type] || 0) + 1; });
+      const topTypes = Object.entries(typeMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+      const diffMap = { EASY: 0, MEDIUM: 0, HARD: 0 };
+      qList.forEach(q => { if (diffMap[q.difficulty] !== undefined) diffMap[q.difficulty]++; });
+
+      const totalAttempts = attempts.length;
+      const correctAttempts = attempts.filter(a => a.is_correct).length;
+      const accuracy = pct(correctAttempts, totalAttempts);
+
+      const schoolName = state.schools.find(x => String(x.national_code) === String(teacher.school_id))?.school_name || '';
+
+      const html = `
+        <div class="info-box">
+          <strong>${esc(teacher.full_name)}</strong>
+          • الرقم: ${esc(teacher.national_id)}
+          • المدرسة: ${esc(schoolName)}
+          • التخصص: ${esc(teacher.subject || '—')}
+          • ${teacher.can_add_questions ? '✅ مصرّح بإضافة الأسئلة' : '⛔ غير مصرّح بإضافة الأسئلة'}
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-value">${totalQ}</div><div class="stat-label">أسئلة أضافها</div></div>
+          <div class="stat-card"><div class="stat-value">${activeQ}</div><div class="stat-label">أسئلة نشطة</div></div>
+          <div class="stat-card"><div class="stat-value">${mathQ}</div><div class="stat-label">رياضيات</div></div>
+          <div class="stat-card"><div class="stat-value">${sciQ}</div><div class="stat-label">علوم</div></div>
+          <div class="stat-card"><div class="stat-value">${totalAttempts}</div><div class="stat-label">محاولات طلاب مدرسته</div></div>
+          <div class="stat-card"><div class="stat-value">${accuracy}</div><div class="stat-label">نسبة صوابهم</div></div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <h3 style="font-size:15px; margin-bottom:10px; color:#1a3a5c;">📊 أكثر الأنواع استخداماً</h3>
+            <div class="info-box" style="padding:14px;">
+              ${topTypes.length === 0 ? '<div style="color:#6b7c8f;">لا توجد أسئلة بعد</div>'
+                : topTypes.map(([type, cnt]) => `
+                  <div style="margin-bottom:8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:12px;">
+                      <span>${esc(type)}</span><strong>${cnt}</strong>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${totalQ ? (cnt/totalQ*100) : 0}%"></div></div>
+                  </div>`).join('')
+              }
+            </div>
+          </div>
+          <div>
+            <h3 style="font-size:15px; margin-bottom:10px; color:#1a3a5c;">📈 توزيع الصعوبة</h3>
+            <div class="info-box" style="padding:14px;">
+              ${[['سهل','EASY','good'],['متوسط','MEDIUM','warn'],['صعب','HARD','bad']].map(([ar, en, cls]) => `
+                <div style="margin-bottom:8px;">
+                  <div style="display:flex; justify-content:space-between; font-size:12px;">
+                    <span>${ar}</span><strong>${diffMap[en]}</strong>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${totalQ ? (diffMap[en]/totalQ*100) : 0}%"></div></div>
+                </div>`).join('')
+              }
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-size:15px; margin:16px 0 10px; color:#1a3a5c;">📚 أحدث الأسئلة التي أضافها</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>المادة</th>
+                <th>النوع</th>
+                <th>نص السؤال</th>
+                <th>الصعوبة</th>
+                <th>الحالة</th>
+                <th>تاريخ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${qList.length === 0
+                ? '<tr><td colspan="7"><div class="empty-state">لم يضف أي سؤال بعد</div></td></tr>'
+                : qList.slice(0, 20).map((q, i) => `
+                  <tr>
+                    <td>${i + 1}</td>
+                    <td>${esc(q.subject)}</td>
+                    <td><span class="tag tag-info">${esc(q.question_type)}</span></td>
+                    <td title="${esc(q.question_text||'')}">${esc((q.question_text||'').slice(0, 50))}${(q.question_text||'').length > 50 ? '…' : ''}</td>
+                    <td><span class="tag ${q.difficulty==='EASY'?'tag-yes':q.difficulty==='HARD'?'tag-no':'tag-warn'}">${q.difficulty==='EASY'?'سهل':q.difficulty==='HARD'?'صعب':'متوسط'}</span></td>
+                    <td>${q.is_active ? '<span class="tag tag-yes">نشط</span>' : '<span class="tag tag-no">معطّل</span>'}</td>
+                    <td>${formatDate(q.created_at)}</td>
+                  </tr>`).join('')
+              }
+            </tbody>
+          </table>
+        </div>
+      `;
+      $('#teacherReport').innerHTML = html;
+
+      setExportData('teacher',
+        ['#','المادة','النوع','نص السؤال','الصعوبة','الحالة','التاريخ'],
+        qList.map((q, i) => [i+1, q.subject, q.question_type, q.question_text||'', q.difficulty||'', q.is_active?'نشط':'معطّل', q.created_at||''])
+      );
+    } catch (e) {
+      console.error(e);
+      $('#teacherReport').innerHTML = `<div class="empty-state" style="color:#c0392b;">خطأ: ${esc(e.message || e)}</div>`;
+    }
+  }
+
+  // ===== تقرير الطالب =====
+  async function loadStudentsForSchool(schoolCode) {
+    const picker = $('#studentPicker');
+    picker.innerHTML = '<option value="">— اختر الطالب —</option>';
+    if (!schoolCode) return;
+
+    const { data: students } = await DB.from('students')
+      .select('national_id, full_name, grade, section')
+      .eq('school_id', Number(schoolCode))
+      .order('full_name');
+    picker.innerHTML = '<option value="">— اختر الطالب —</option>' +
+      (students || []).map(s => `<option value="${esc(s.national_id)}">${esc(s.full_name)} (${esc(s.grade||'')}-${esc(s.section||'')})</option>`).join('');
+  }
+
+  async function loadStudentReport(studentId) {
+    if (!studentId) {
+      $('#studentReport').innerHTML = '<div class="empty-state">اختر طالب لعرض التقرير</div>';
+      return;
+    }
+    $('#studentReport').innerHTML = '<div class="empty-state">جارٍ التحميل...</div>';
+    try {
+      const { data: student } = await DB.from('students').select('*').eq('national_id', studentId).maybeSingle();
+      if (!student) {
+        $('#studentReport').innerHTML = '<div class="empty-state">الطالب غير موجود</div>';
+        return;
+      }
+
+      const { data: attempts } = await DB.from('student_question_attempts')
+        .select('*')
+        .eq('student_id', studentId)
+        .order('updated_at', { ascending: false });
+      const list = attempts || [];
+
+      const qIds = [...new Set(list.map(a => a.question_id))];
+      let questionsMap = {};
+      if (qIds.length > 0) {
+        const { data: qs } = await DB.from('questions').select('id, question_text, question_type, subject, difficulty, points, cognitive').in('id', qIds.slice(0, 500));
+        (qs || []).forEach(q => { questionsMap[q.id] = q; });
+      }
+
+      const total = list.length;
+      const correct = list.filter(a => a.is_correct).length;
+      const accuracy = pct(correct, total);
+      const avgScore = total ? (list.reduce((s, a) => s + (Number(a.score) || 0), 0) / total).toFixed(2) : '—';
+      const totalPoints = list.reduce((s, a) => s + (Number(a.score) || 0), 0).toFixed(2);
+
+      const bySubject = {};
+      list.forEach(a => {
+        const k = a.subject || 'غير محدد';
+        if (!bySubject[k]) bySubject[k] = { t: 0, c: 0, score: 0 };
+        bySubject[k].t++;
+        if (a.is_correct) bySubject[k].c++;
+        bySubject[k].score += (Number(a.score) || 0);
+      });
+
+      const byDiff = {};
+      list.forEach(a => {
+        const k = a.difficulty || 'غير محدد';
+        if (!byDiff[k]) byDiff[k] = { t: 0, c: 0 };
+        byDiff[k].t++;
+        if (a.is_correct) byDiff[k].c++;
+      });
+
+      const byType = {};
+      list.forEach(a => {
+        const q = questionsMap[a.question_id];
+        const k = q?.question_type || 'غير محدد';
+        if (!byType[k]) byType[k] = { t: 0, c: 0 };
+        byType[k].t++;
+        if (a.is_correct) byType[k].c++;
+      });
+
+      const schoolName = state.schools.find(x => String(x.national_code) === String(student.school_id))?.school_name || '';
+
+      const html = `
+        <div class="info-box">
+          <strong>${esc(student.full_name)}</strong>
+          • الرقم: ${esc(student.national_id)}
+          • ${esc(schoolName)}
+          • الصف ${esc(student.grade || '—')} — شعبة ${esc(student.section || '—')}
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">إجمالي المحاولات</div></div>
+          <div class="stat-card"><div class="stat-value">${correct}</div><div class="stat-label">إجابات صحيحة</div></div>
+          <div class="stat-card"><div class="stat-value">${accuracy}</div><div class="stat-label">نسبة الصواب</div></div>
+          <div class="stat-card"><div class="stat-value">${avgScore}</div><div class="stat-label">متوسط النقاط</div></div>
+          <div class="stat-card"><div class="stat-value">${totalPoints}</div><div class="stat-label">مجموع النقاط</div></div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <h3 style="font-size:15px; margin-bottom:10px; color:#1a3a5c;">📚 الأداء حسب المادة</h3>
+            <div class="info-box" style="padding:14px;">
+              ${Object.keys(bySubject).length === 0 ? '<div style="color:#6b7c8f;">لا توجد بيانات</div>'
+                : Object.entries(bySubject).map(([k, v]) => {
+                  const p = v.t ? (v.c / v.t * 100) : 0;
+                  return `<div style="margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; font-size:12px;">
+                      <span>${esc(k)}</span><strong>${v.c}/${v.t} (${p.toFixed(0)}%)</strong>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill ${progressClass(p)}" style="width:${p}%"></div></div>
+                  </div>`;
+                }).join('')
+              }
+            </div>
+          </div>
+          <div>
+            <h3 style="font-size:15px; margin-bottom:10px; color:#1a3a5c;">📈 الأداء حسب الصعوبة</h3>
+            <div class="info-box" style="padding:14px;">
+              ${Object.keys(byDiff).length === 0 ? '<div style="color:#6b7c8f;">لا توجد بيانات</div>'
+                : Object.entries(byDiff).map(([k, v]) => {
+                  const diffAr = { EASY:'سهل', MEDIUM:'متوسط', HARD:'صعب' }[k] || k;
+                  const p = v.t ? (v.c / v.t * 100) : 0;
+                  return `<div style="margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; font-size:12px;">
+                      <span>${esc(diffAr)}</span><strong>${v.c}/${v.t} (${p.toFixed(0)}%)</strong>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill ${progressClass(p)}" style="width:${p}%"></div></div>
+                  </div>`;
+                }).join('')
+              }
+            </div>
+          </div>
+        </div>
+
+        ${Object.keys(byType).length > 0 ? `
+        <h3 style="font-size:15px; margin:16px 0 10px; color:#1a3a5c;">🎯 الأداء حسب نوع السؤال</h3>
+        <div class="info-box">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+            ${Object.entries(byType).map(([k, v]) => {
+              const p = v.t ? (v.c / v.t * 100) : 0;
+              return `<div>
+                <div style="font-size:12px; font-weight:700; margin-bottom:4px;">${esc(k)}</div>
+                <div style="font-size:13px;">${v.c}/${v.t} • <strong>${p.toFixed(0)}%</strong></div>
+                <div class="progress-bar"><div class="progress-fill ${progressClass(p)}" style="width:${p}%"></div></div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
+
+        <h3 style="font-size:15px; margin:16px 0 10px; color:#1a3a5c;">📝 سجل المحاولات (${Math.min(list.length, 50)})</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>نص السؤال</th>
+                <th>المادة</th>
+                <th>النوع</th>
+                <th>الصعوبة</th>
+                <th>النقاط</th>
+                <th>النتيجة</th>
+                <th>التاريخ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.length === 0
+                ? '<tr><td colspan="8"><div class="empty-state">لا توجد محاولات مسجلة</div></td></tr>'
+                : list.slice(0, 50).map((a, i) => {
+                  const q = questionsMap[a.question_id] || {};
+                  return `<tr>
+                    <td>${i + 1}</td>
+                    <td title="${esc(q.question_text||'')}">${esc((q.question_text||'').slice(0, 50))}${(q.question_text||'').length > 50 ? '…' : ''}</td>
+                    <td>${esc(a.subject || q.subject || '—')}</td>
+                    <td><span class="tag tag-info">${esc(q.question_type || '—')}</span></td>
+                    <td>${esc(a.difficulty === 'EASY' ? 'سهل' : a.difficulty === 'HARD' ? 'صعب' : a.difficulty === 'MEDIUM' ? 'متوسط' : (a.difficulty || '—'))}</td>
+                    <td>${esc(a.score ?? '—')}</td>
+                    <td>${a.is_correct ? '<span class="tag tag-yes">✓ صحيح</span>' : '<span class="tag tag-no">✗ خطأ</span>'}</td>
+                    <td style="font-size:11px; color:#6b7c8f;">${formatDate(a.updated_at)}</td>
+                  </tr>`;
+                }).join('')
+              }
+            </tbody>
+          </table>
+        </div>
+      `;
+      $('#studentReport').innerHTML = html;
+
+      setExportData('student',
+        ['#','السؤال','المادة','النوع','الصعوبة','النقاط','النتيجة','التاريخ'],
+        list.map((a, i) => {
+          const q = questionsMap[a.question_id] || {};
+          return [i+1, q.question_text||'', a.subject||'', q.question_type||'', a.difficulty||'', a.score||0, a.is_correct?'صحيح':'خطأ', a.updated_at||''];
+        })
+      );
+    } catch (e) {
+      console.error(e);
+      $('#studentReport').innerHTML = `<div class="empty-state" style="color:#c0392b;">خطأ: ${esc(e.message || e)}</div>`;
+    }
+  }
+
+  // ===== الأحداث =====
+  function bindEvents() {
+    $('#schoolPicker').addEventListener('change', (e) => loadSchoolReport(e.target.value));
+    $('#sectionSchoolPicker').addEventListener('change', async (e) => {
+      await loadSectionsForSchool(e.target.value);
+      $('#sectionReport').innerHTML = '<div class="empty-state">اختر شعبة لعرض التقرير</div>';
+    });
+    $('#sectionPicker').addEventListener('change', (e) => {
+      const schoolCode = $('#sectionSchoolPicker').value;
+      loadSectionReport(schoolCode, e.target.value);
+    });
+    $('#teacherSchoolPicker').addEventListener('change', async (e) => {
+      await loadTeachersForSchool(e.target.value);
+      $('#teacherReport').innerHTML = '<div class="empty-state">اختر معلماً لعرض التقرير</div>';
+    });
+    $('#teacherPicker').addEventListener('change', (e) => loadTeacherReport(e.target.value));
+    $('#studentSchoolPicker').addEventListener('change', async (e) => {
+      await loadStudentsForSchool(e.target.value);
+      $('#studentReport').innerHTML = '<div class="empty-state">اختر طالباً لعرض التقرير</div>';
+    });
+    $('#studentPicker').addEventListener('change', (e) => loadStudentReport(e.target.value));
+
+    $('#btnPrintSchool').addEventListener('click', () => window.print());
+    $('#btnPrintSection').addEventListener('click', () => window.print());
+    $('#btnPrintTeacher').addEventListener('click', () => window.print());
+    $('#btnPrintStudent').addEventListener('click', () => window.print());
+
+    $('#btnExportSchool').addEventListener('click', () => exportCSV('school', 'school-report.csv'));
+    $('#btnExportSection').addEventListener('click', () => exportCSV('section', 'section-report.csv'));
+    $('#btnExportTeacher').addEventListener('click', () => exportCSV('teacher', 'teacher-report.csv'));
+    $('#btnExportStudent').addEventListener('click', () => exportCSV('student', 'student-report.csv'));
+  }
+
+  // ===== الإقلاع =====
+  async function boot() {
+    renderHeader();
+    buildTabs();
+    bindEvents();
+
+    try {
+      state.schools = await loadAccessibleSchools();
+      console.log('📊 ACCESSIBLE SCHOOLS:', state.schools.length, '| directorateId:', state.directorateId);
+      console.log('📊 first school:', state.schools[0]);
+      fillSchoolPickers();
+
+      if (state.schools.length === 0) {
+        toast('⚠️ لم يتم العثور على أي مدرسة — راجع Console (F12)', 'error', 6000);
+      }
+
+      if (state.role === 'teacher' && state.schools.length === 1) {
+        const code = String(state.schools[0].national_code);
+        ['#schoolPicker','#sectionSchoolPicker','#teacherSchoolPicker','#studentSchoolPicker'].forEach(sel => $(sel).value = code);
+        await loadTeachersForSchool(code);
+        $('#teacherPicker').value = state.nationalId;
+        const tab = document.querySelector('.tab[data-tab="teacher"]');
+        if (tab) tab.click();
+        await loadTeacherReport(state.nationalId);
+      } else if (state.role === 'student' && state.schools.length === 1) {
+        const code = String(state.schools[0].national_code);
+        $('#studentSchoolPicker').value = code;
+        await loadStudentsForSchool(code);
+        $('#studentPicker').value = state.nationalId;
+        await loadStudentReport(state.nationalId);
+      }
+    } catch (e) {
+      console.error(e);
+      toast('خطأ في التحميل: ' + (e.message || e), 'error');
+    } finally {
+      hideLoading();
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

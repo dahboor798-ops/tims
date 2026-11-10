@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة TIMSS 2027 — تسجيل الدخول</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', 'Tahoma', sans-serif; }
+        body {
+            margin: 0; padding: 20px; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #1a3a5c, #2c5f8a, #1e4d73);
+        }
+        .login-card {
+            background: #fff; border-radius: 16px; width: 100%; max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.35); overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card-header {
+            background: linear-gradient(135deg, #1a3a5c, #2c5f8a);
+            color: #fff; padding: 15px 15px; text-align: center;
+        }
+        .card-header h1 { margin: 0 0 5px 0; font-size: 22px; }
+        .dedication-text {
+            font-size: 12px; line-height: 1.5; opacity: 0.95;
+            margin-top: 5px;
+        }
+        .dedication-text div { margin-bottom: 2px; }
+        .whatsapp-link {
+            color: #fff; text-decoration: none; font-weight: bold; direction: ltr; display: inline-block;
+        }
+        .whatsapp-link:hover { text-decoration: underline; }
+        
+        .card-body { padding: 30px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; margin-bottom: 8px; font-weight: 700;
+            color: #4a5c6e; font-size: 13px;
+        }
+        .form-group input {
+            width: 100%; padding: 12px 15px; border: 2px solid #d8e2ec;
+            border-radius: 10px; font-size: 15px; transition: all 0.2s;
+        }
+        .form-group input:focus {
+            outline: none; border-color: #2c5f8a;
+            box-shadow: 0 0 0 4px rgba(44,95,138,.12);
+        }
+        
+        .btn-login {
+            width: 100%; padding: 14px; border: none; border-radius: 10px;
+            background: linear-gradient(135deg, #1a3a5c, #2c5f8a); color: #fff;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26,58,92,.35);
+        }
+        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .error-msg {
+            background: #f8d7da; color: #c0392b; padding: 12px;
+            border-radius: 8px; font-size: 13px; margin-bottom: 20px;
+            text-align: center; font-weight: bold; display: none;
+        }
+        
+        .resume-screen {
+            display: none; flex-direction: column; align-items: center;
+            justify-content: center; padding: 40px 20px; text-align: center;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #d8e2ec;
+            border-top-color: #2c5f8a; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .loading-overlay {
+            position: fixed; inset: 0; background: rgba(15,30,50,.85);
+            display: none; flex-direction: column; align-items: center;
+            justify-content: center; z-index: 1000; color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card" id="loginCard">
+        <div class="card-header">
+            <h1>🎓 منصة TIMSS 2027</h1>
+            <div class="dedication-text">
+                <div>إهداء لمديرية التربية والتعليم</div>
+                <div>من الأستاذ عواد دحبور</div>
+                <div>
+                    <a href="https://wa.me/96278810669" target="_blank" class="whatsapp-link">+96278810669</a>
+                    <span style="font-size: 10px; opacity: 0.8; margin-right: 5px;">(الرقم يوصلك للواتس اب)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body" id="formContainer">
+            <div class="error-msg" id="errorMsg"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>الرقم الوطني (أو رقم المستخدم)</label>
+                    <input type="text" id="username" required placeholder="أدخل رقمك هنا..." autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور (أو رقم المدرسة)</label>
+                    <input type="password" id="password" required placeholder="أدخل كلمة المرور...">
+                </div>
+                <button type="submit" class="btn-login" id="btnSubmit">دخول</button>
+            </form>
+        </div>
+
+        <div class="resume-screen" id="resumeContainer">
+            <div class="spinner"></div>
+            <h2 style="color: #1a3a5c; margin: 0 0 10px;">لديك جلسة نشطة</h2>
+            <p style="color: #6b7c8f; margin: 0 0 20px;" id="resumeName"></p>
+            <p style="color: #4a5c6e; font-size: 13px;">جاري تحويلك للصفحة الرئيسية...</p>
+            <button class="btn-login" style="margin-top: 20px; background: #c0392b;" onclick="forceLogout()">تسجيل الخروج والدخول بحساب آخر</button>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>جاري التحقق من البيانات...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        localStorage.removeItem('timss_session');
+        localStorage.removeItem('SESSION_KEY');
+
+        const DB = window.supabaseClient;
+        const activeSession = auth.getSession();
+        
+        if (activeSession) {
+            document.getElementById('formContainer').style.display = 'none';
+            document.getElementById('resumeContainer').style.display = 'flex';
+            document.getElementById('resumeName').textContent = 'مرحباً، ' + (activeSession.full_name || activeSession.national_id);
+            
+            setTimeout(() => {
+                if (activeSession.role === 'admin') location.href = 'admin.html';
+                else if (activeSession.role === 'supervisor') location.href = 'supervisor.html';
+                else if (activeSession.role === 'teacher') location.href = 'teacher.html';
+                else if (activeSession.role === 'student') location.href = 'student.html';
+                else forceLogout();
+            }, 1500);
+        }
+
+        function forceLogout() {
+            auth.logout();
+            window.location.reload();
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const btn = document.getElementById('btnSubmit');
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (!username || !password) return;
+
+            btn.disabled = true;
+            btn.textContent = 'جاري التحقق...';
+            errorMsg.style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                if (!DB) throw new Error('فشل الاتصال بقاعدة البيانات');
+
+                let sessionData = null;
+
+                // 1. تم إزالة كود الأدمن من هنا نهائياً (الأدمن له صفحة دخول سرية خاصة به)
+                
+                // 2. التحقق من المشرف
+                if (!sessionData) {
+                    const { data: sup } = await DB.from('supervisors')
+                        .select('national_id, full_name')
+                        .eq('national_id', username)
+                        .maybeSingle();
+                    
+                    if (sup && (password === '1303' || password === sup.national_id)) {
+                        sessionData = {
+                            role: 'supervisor',
+                            national_id: sup.national_id,
+                            full_name: sup.full_name
+                        };
+                    }
+                }
+
+                // 3. التحقق من المعلم
+                if (!sessionData) {
+                    const { data: teacher } = await DB.from('teachers')
+                        .select('national_id, full_name, school_id, can_add_questions')
+                        .eq('national_id', username)
+                        .maybeSingle();
+                    
+                    if (teacher && String(teacher.school_id) === String(password)) {
+                        sessionData = {
+                            role: 'teacher',
+                            national_id: teacher.national_id,
+                            full_name: teacher.full_name,
+                            school_id: teacher.school_id,
+                            can_add_questions: teacher.can_add_questions
+                        };
+                    }
+                }
+
+                // 4. التحقق من الطالب
+                if (!sessionData) {
+                    const { data: student } = await DB.from('students')
+                        .select('national_id, full_name, school_id')
+                        .eq('national_id', username)
+                        .maybeSingle();
+                    
+                    if (student && String(student.school_id) === String(password)) {
+                        sessionData = {
+                            role: 'student',
+                            national_id: student.national_id,
+                            full_name: student.full_name,
+                            school_id: student.school_id
+                        };
+                    }
+                }
+
+                // النتيجة النهائية
+                if (sessionData) {
+                    auth.saveSession(sessionData);
+                    
+                    if (sessionData.role === 'supervisor') location.href = 'supervisor.html';
+                    else if (sessionData.role === 'teacher') location.href = 'teacher.html';
+                    else if (sessionData.role === 'student') location.href = 'student.html';
+                } else {
+                    // رسالة خطأ موحدة لا تكشف عن وجود حساب أدمن
+                    throw new Error('الرقم الوطني أو كلمة المرور غير صحيحة');
+                }
+
+            } catch (error) {
+                console.error(error);
+                errorMsg.textContent = error.message || 'حدث خطأ في الاتصال، يرجى المحاولة لاحقاً';
+                errorMsg.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'دخول';
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

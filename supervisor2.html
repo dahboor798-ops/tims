@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة المشرف — TIMSS 2027</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-2: #2c5f8a;
+    --primary-3: #1e4d73;
+    --border: #d8e2ec;
+    --bg-light: #f5f8fc;
+    --text: #1a3a5c;
+    --muted: #6b7c8f;
+    --success: #1e7e34;
+    --success-bg: #d4edda;
+    --danger: #c0392b;
+    --danger-bg: #f8d7da;
+    --warning: #b8860b;
+    --warning-bg: #fff3cd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Tahoma', sans-serif;
+    background: linear-gradient(135deg, #1a3a5c, #2c5f8a, #1e4d73);
+    min-height: 100vh;
+    padding: 24px 16px;
+    color: var(--text);
+  }
+  .container { max-width: 1240px; margin: 0 auto; }
+
+  .top-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .top-header {
+    background: linear-gradient(135deg, #1a3a5c, #2c5f8a);
+    color: #fff;
+    padding: 22px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .top-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .top-header .subtitle { font-size: 13px; opacity: .85; }
+  .badge-version {
+    background: rgba(255,255,255,.18);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .user-block { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .user-info { text-align: left; }
+  .user-info .name { font-weight: 700; font-size: 15px; }
+  .user-info .meta { font-size: 12px; opacity: .85; }
+  .btn-logout {
+    background: rgba(255,255,255,.15);
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,.4);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: .2s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,.28); }
+
+  .tabs {
+    display: flex;
+    background: #f0f4f9;
+    border-bottom: 2px solid var(--border);
+    padding: 0 12px;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 14px 22px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    border-bottom: 3px solid transparent;
+    transition: .2s;
+    white-space: nowrap;
+    background: none;
+    border-top: none; border-left: none; border-right: none;
+    font-family: inherit;
+  }
+  .tab:hover { color: var(--primary-2); }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary-2); background: #fff; }
+
+  .panel { display: none; padding: 24px 28px; background: #fff; }
+  .panel.active { display: block; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: linear-gradient(135deg, #f5f8fc, #eaf1f9);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+  }
+  .stat-value { font-size: 28px; font-weight: 800; color: var(--primary-2); }
+  .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 220px;
+    padding: 11px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: .2s;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary-2);
+    box-shadow: 0 0 0 4px rgba(44,95,138,.12);
+  }
+  select.filter-select {
+    padding: 11px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    background: #fff;
+    cursor: pointer;
+  }
+  select.filter-select:focus { outline: none; border-color: var(--primary-2); }
+
+  .btn {
+    padding: 11px 20px;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #1a3a5c, #2c5f8a);
+    color: #fff;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(26,58,92,.35); }
+  .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover { background: #155d27; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: #a5322a; }
+  .btn-ghost { background: #eaf1f9; color: var(--primary); }
+  .btn-ghost:hover { background: #d8e6f3; }
+
+  .table-wrap {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead { background: #f0f4f9; }
+  th {
+    padding: 13px 14px;
+    text-align: right;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 13px;
+    border-bottom: 2px solid var(--border);
+  }
+  td { padding: 12px 14px; border-bottom: 1px solid #eef3f8; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f9fbfd; }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .tag-yes { background: var(--success-bg); color: var(--success); }
+  .tag-no { background: #eef3f8; color: var(--muted); }
+  .tag-info { background: #d1ecf1; color: #1a5276; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,30,50,.55);
+    backdrop-filter: blur(3px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    background: linear-gradient(135deg, #1a3a5c, #2c5f8a);
+    color: #fff;
+    padding: 18px 24px;
+    font-weight: 700;
+    font-size: 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    opacity: .8;
+  }
+  .modal-close:hover { opacity: 1; }
+  .modal-body { padding: 24px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--primary);
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: .2s;
+    background: #fff;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-2);
+    box-shadow: 0 0 0 4px rgba(44,95,138,.12);
+  }
+  .modal-footer {
+    padding: 16px 24px;
+    background: #f9fbfd;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+  .toast {
+    padding: 13px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    animation: slideDown .3s ease;
+    max-width: 90vw;
+  }
+  .toast.success { background: var(--success-bg); color: var(--success); border: 1.5px solid var(--success); }
+  .toast.error { background: var(--danger-bg); color: var(--danger); border: 1.5px solid var(--danger); }
+  .toast.info { background: #d1ecf1; color: #1a5276; border: 1.5px solid #1a5276; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,58,92,.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    color: #fff;
+    flex-direction: column;
+    gap: 16px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid rgba(255,255,255,.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay.hidden { display: none; }
+
+  .cta-box {
+    background: linear-gradient(135deg, #eaf1f9, #d8e6f3);
+    border: 1.5px dashed var(--primary-2);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-top: 16px;
+  }
+  .cta-box h3 { color: var(--primary); margin-bottom: 8px; font-size: 17px; }
+  .cta-box p { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .cta-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-reports {
+    background: linear-gradient(135deg, #1e7e34, #28a745) !important;
+    color: #fff !important;
+  }
+  .btn-reports:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(30,126,52,.35);
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div>جارٍ التحميل...</div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="container">
+
+  <div class="top-card">
+    <div class="top-header">
+      <div>
+        <h1>لوحة المشرف <span class="badge-version">TIMSS 2027</span></h1>
+        <div class="subtitle">إدارة المدارس والمعلمين والأسئلة</div>
+      </div>
+      <div class="user-block">
+        <div class="user-info">
+          <div class="name" data-user-name>—</div>
+          <div class="meta" id="userMeta">—</div>
+        </div>
+        <button class="btn-logout" data-logout>🚪 خروج</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="schools">🏫 المدارس</button>
+      <button class="tab" data-tab="teachers">👨‍🏫 المعلمون</button>
+      <button class="tab" data-tab="questions">📚 الأسئلة</button>
+    </div>
+  </div>
+
+  <!-- ===== Schools Panel ===== -->
+  <div class="panel active" id="panel-schools">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="statSchools">0</div>
+        <div class="stat-label">عدد المدارس</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statTeachersSchools">0</div>
+        <div class="stat-label">إجمالي المعلمين</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" class="search-input" id="schoolSearch" placeholder="🔍 ابحث باسم المدرسة أو الرقم...">
+      <button class="btn btn-primary" id="btnAddSchool">➕ إضافة مدرسة</button>
+      <button class="btn btn-ghost" id="btnReloadSchools">🔄 تحديث</button>
+      <button class="btn btn-ghost" id="btnDiagnose">🔍 تشخيص</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>الرقم الوطني</th>
+            <th>اسم المدرسة</th>
+            <th>الجنس</th>
+            <th>النوع</th>
+            <th>عدد المعلمين</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="schoolsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== Teachers Panel ===== -->
+  <div class="panel" id="panel-teachers">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="statTeachers">0</div>
+        <div class="stat-label">إجمالي المعلمين</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statCanAdd">0</div>
+        <div class="stat-label">مصرّح لهم بإضافة الأسئلة</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" class="search-input" id="teacherSearch" placeholder="🔍 ابحث بالاسم أو الرقم الوطني...">
+      <select class="filter-select" id="teacherSchoolFilter">
+        <option value="">كل المدارس</option>
+      </select>
+      <button class="btn btn-primary" id="btnAddTeacher">➕ إضافة معلم</button>
+      <button class="btn btn-ghost" id="btnReloadTeachers">🔄 تحديث</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>الرقم الوطني</th>
+            <th>الاسم الكامل</th>
+            <th>المدرسة</th>
+            <th>التخصص</th>
+            <th>صلاحية الأسئلة</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="teachersBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== Questions Panel ===== -->
+  <div class="panel" id="panel-questions">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="statMyQuestions">0</div>
+        <div class="stat-label">أسئلتي المضافة</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statMyActive">0</div>
+        <div class="stat-label">الأسئلة النشطة</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statMyMath">0</div>
+        <div class="stat-label">رياضيات</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statMyScience">0</div>
+        <div class="stat-label">علوم</div>
+      </div>
+    </div>
+
+    <div class="cta-box">
+      <h3>📝 إدارة بنك الأسئلة والتقارير</h3>
+      <p>أضف الأسئلة واعرض تقارير المدارس والشعب والمعلمين والطلاب</p>
+      <div class="cta-buttons">
+        <button class="btn btn-primary" id="btnOpenQuestionsManager">🚀 فتح مدير الأسئلة</button>
+        <button class="btn btn-reports" id="btnOpenReports">📊 فتح التقارير</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== Modal: Add School ===== -->
+<div class="modal-overlay" id="modalSchool">
+  <div class="modal">
+    <div class="modal-header">
+      <span>🏫 إضافة مدرسة جديدة</span>
+      <button class="modal-close" data-close-modal="modalSchool">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>الرقم الوطني للمدرسة *</label>
+        <input type="text" id="schoolIdInput" placeholder="مثال: 1012345">
+      </div>
+      <div class="form-group">
+        <label>اسم المدرسة *</label>
+        <input type="text" id="schoolNameInput" placeholder="مدرسة الأمل الأساسية">
+      </div>
+      <div class="form-group">
+        <label>الجنس</label>
+        <select id="schoolGenderInput">
+          <option value="">— اختر —</option>
+          <option value="بنين">بنين</option>
+          <option value="بنات">بنات</option>
+          <option value="مختلط">مختلط</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>نوع المدرسة</label>
+        <select id="schoolTypeInput">
+          <option value="">— اختر —</option>
+          <option value="حكومي">حكومي</option>
+          <option value="خاص">خاص</option>
+          <option value="وكالة">وكالة</option>
+          <option value="دولي">دولي</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close-modal="modalSchool">إلغاء</button>
+      <button class="btn btn-primary" id="btnSaveSchool">حفظ المدرسة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Add Teacher ===== -->
+<div class="modal-overlay" id="modalTeacher">
+  <div class="modal">
+    <div class="modal-header">
+      <span>👨‍🏫 إضافة معلم جديد</span>
+      <button class="modal-close" data-close-modal="modalTeacher">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>الرقم الوطني *</label>
+        <input type="text" id="teacherNidInput" placeholder="الرقم الوطني للمعلم">
+      </div>
+      <div class="form-group">
+        <label>الاسم الكامل *</label>
+        <input type="text" id="teacherNameInput" placeholder="الاسم الرباعي">
+      </div>
+      <div class="form-group">
+        <label>المدرسة *</label>
+        <select id="teacherSchoolSelect"></select>
+      </div>
+      <div class="form-group">
+        <label>التخصص</label>
+        <input type="text" id="teacherSpecInput" placeholder="رياضيات / علوم / ...">
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="teacherCanAddInput" style="width:auto; margin-left:6px;">
+          منح صلاحية إضافة الأسئلة مباشرة
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close-modal="modalTeacher">إلغاء</button>
+      <button class="btn btn-primary" id="btnSaveTeacher">حفظ المعلم</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Diagnostic ===== -->
+<div class="modal-overlay" id="modalDiag">
+  <div class="modal" style="max-width: 780px;">
+    <div class="modal-header">
+      <span>🔍 تشخيص النظام</span>
+      <button class="modal-close" data-close-modal="modalDiag">×</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <pre id="diagBody" style="background:#0f1e32; color:#7ee787; padding:18px; font-family:'Courier New',monospace; font-size:12px; direction:ltr; text-align:left; max-height:60vh; overflow:auto; white-space:pre-wrap; margin:0;"></pre>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close-modal="modalDiag">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+<script>
+(async function () {
+  'use strict';
+
+  const DB = (window.supabaseClient && typeof window.supabaseClient.from === 'function') ? window.supabaseClient
+           : (window.supabase && typeof window.supabase.from === 'function') ? window.supabase
+           : window.db;
+  if (!DB) { alert('فشل تحميل عميل Supabase. تأكد من supabase-client.js'); return; }
+
+  // ==== الحماية ====
+  try {
+    if (window.auth && typeof auth.requireRole === 'function') {
+      await auth.requireRole('supervisor');
+    }
+  } catch (e) {
+    console.warn('requireRole error', e);
+  }
+  const session = (window.auth && auth.getSession) ? auth.getSession() : null;
+  if (!session || session.role !== 'supervisor') {
+    location.href = 'index.html';
+    return;
+  }
+
+  // ==== الحالة (حسب الـ schema الفعلي) ====
+  const state = {
+    session,
+    role: session.role,
+    nationalId: String(session.national_id ?? session.nationalId ?? ''),
+    name: session.full_name || session.name || 'مشرف',
+    directorateId: session.directorate_id ?? session.directorateId
+                   ?? session.directorate ?? session.dir_id ?? session.dir ?? null,
+    directorateName: session.directorate_name || session.directorateName || session.dir_name || '',
+    schools: [],
+    teachers: [],
+    questionsCount: { total: 0, active: 0, math: 0, science: 0 }
+  };
+
+  // ==== عناصر ====
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+  const loading = $('#loading');
+
+  // ==== أدوات ====
+  function toast(msg, type = 'info', ms = 3200) {
+    const c = $('#toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transition = 'opacity .3s';
+      setTimeout(() => t.remove(), 300);
+    }, ms);
+  }
+  function escapeHtml(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function hideLoading() { loading.classList.add('hidden'); }
+  function openModal(id) { $('#' + id).classList.add('open'); }
+  function closeModal(id) { $('#' + id).classList.remove('open'); }
+
+  // ==== المفتاح الأساسي للمدرسة ====
+  const SCHOOL_KEY = 'national_code';
+
+  // ==== اسم المديرية ====
+  async function loadDirectorateName() {
+    if (!state.directorateId) return;
+    try {
+      const { data, error } = await DB
+        .from('directorates')
+        .select('directorate_name')
+        .eq('national_code', state.directorateId)
+        .maybeSingle();
+      if (!error && data && data.directorate_name) {
+        state.directorateName = data.directorate_name;
+      }
+    } catch (e) { /* صامت */ }
+  }
+
+  // ==== تحميل المدارس ====
+  async function loadSchools() {
+    console.log('🔍 loadSchools — directorateId:', state.directorateId);
+    let query = DB.from('schools').select('*');
+    if (state.directorateId != null) {
+      query = query.eq('directorate_id', state.directorateId);
+    }
+    const { data, error } = await query.order('school_name', { ascending: true });
+    if (error) { console.error('loadSchools error:', error); throw error; }
+    state.schools = data || [];
+    console.log('✓ Schools loaded:', state.schools.length, '| sample:', state.schools[0]);
+  }
+
+  // ==== تحميل المعلمين ====
+  async function loadTeachers() {
+    if (state.schools.length === 0) {
+      state.teachers = [];
+      return;
+    }
+    const codes = state.schools.map(s => s[SCHOOL_KEY]).filter(v => v != null);
+    console.log('🔍 loadTeachers — school national_codes:', codes.slice(0, 5), '...(total ' + codes.length + ')');
+
+    const { data, error } = await DB
+      .from('teachers')
+      .select('*')
+      .in('school_id', codes)
+      .order('full_name', { ascending: true });
+
+    if (error) { console.error('loadTeachers error:', error); throw error; }
+    state.teachers = data || [];
+    console.log('✓ Teachers loaded:', state.teachers.length, '| sample:', state.teachers[0]);
+  }
+
+  // ==== إحصاءات الأسئلة ====
+  async function loadQuestionsStats() {
+    try {
+      const base = () => DB.from('questions').select('*', { count: 'exact', head: true }).eq('added_by_id', String(state.nationalId));
+      const [totalRes, activeRes, mathRes, scienceRes] = await Promise.all([
+        base(),
+        base().eq('is_active', true),
+        base().eq('subject', 'رياضيات'),
+        base().eq('subject', 'علوم')
+      ]);
+      state.questionsCount = {
+        total: totalRes.count ?? 0,
+        active: activeRes.count ?? 0,
+        math: mathRes.count ?? 0,
+        science: scienceRes.count ?? 0
+      };
+    } catch (e) { console.warn('stats error', e); }
+  }
+
+  // ==== الرأس ====
+  function renderHeader() {
+    const nameEl = document.querySelector('[data-user-name]');
+    if (nameEl) nameEl.textContent = state.name || 'مشرف';
+    const meta = $('#userMeta');
+    if (meta) {
+      const parts = [];
+      if (state.directorateName) parts.push('مديرية: ' + state.directorateName);
+      else if (state.directorateId) parts.push('مديرية رقم: ' + state.directorateId);
+      if (state.nationalId) parts.push('الرقم الوطني: ' + state.nationalId);
+      meta.textContent = parts.join(' • ') || '—';
+    }
+  }
+
+  // ==== رسم المدارس ====
+  function renderSchools(filterText = '') {
+    const tbody = $('#schoolsBody');
+    const f = filterText.trim().toLowerCase();
+    const list = state.schools.filter(s =>
+      !f ||
+      String(s.school_name || '').toLowerCase().includes(f) ||
+      String(s[SCHOOL_KEY] || '').toLowerCase().includes(f)
+    );
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">لا توجد مدارس مطابقة. اضغط "إضافة مدرسة" للبدء.</div></td></tr>`;
+    } else {
+      tbody.innerHTML = list.map((s, i) => {
+        const code = s[SCHOOL_KEY];
+        const cnt = state.teachers.filter(t => String(t.school_id) === String(code)).length;
+        return `<tr>
+          <td>${i + 1}</td>
+          <td><strong>${escapeHtml(code)}</strong></td>
+          <td>${escapeHtml(s.school_name)}</td>
+          <td>${escapeHtml(s.gender || '—')}</td>
+          <td>${escapeHtml(s.school_type || '—')}</td>
+          <td>${cnt}</td>
+          <td>
+            <button class="btn btn-sm btn-ghost" data-act="view-teachers" data-school-id="${escapeHtml(code)}">👁️ معلمو المدرسة</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+    $('#statSchools').textContent = state.schools.length;
+    $('#statTeachersSchools').textContent = state.teachers.length;
+  }
+
+  // ==== رسم المعلمين ====
+  function renderTeachers() {
+    const tbody = $('#teachersBody');
+    const q = $('#teacherSearch').value.trim().toLowerCase();
+    const schoolFilter = $('#teacherSchoolFilter').value;
+
+    const schoolMap = {};
+    state.schools.forEach(s => { schoolMap[String(s[SCHOOL_KEY])] = s.school_name; });
+
+    const list = state.teachers.filter(t => {
+      if (schoolFilter && String(t.school_id) !== String(schoolFilter)) return false;
+      if (!q) return true;
+      return String(t.full_name || '').toLowerCase().includes(q)
+          || String(t.national_id || '').toLowerCase().includes(q)
+          || String(t.subject  || '').toLowerCase().includes(q);
+    });
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">لا يوجد معلمون مطابقون.</div></td></tr>`;
+    } else {
+      tbody.innerHTML = list.map((t, i) => {
+        const can = !!t.can_add_questions;
+        const school = schoolMap[String(t.school_id)] || t.school_id || '—';
+        return `<tr>
+          <td>${i + 1}</td>
+          <td>${escapeHtml(t.national_id)}</td>
+          <td>${escapeHtml(t.full_name)}</td>
+          <td>${escapeHtml(school)}</td>
+          <td>${escapeHtml(t.subject  || '—')}</td>
+          <td><span class="tag ${can ? 'tag-yes' : 'tag-no'}">${can ? 'مصرّح ✓' : 'غير مصرّح ✗'}</span></td>
+          <td>
+            <button class="btn btn-sm ${can ? 'btn-danger' : 'btn-success'}" data-act="toggle-perm" data-nid="${escapeHtml(t.national_id)}" data-can="${can ? 1 : 0}">
+              ${can ? 'سحب الصلاحية' : 'منح الصلاحية'}
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    const total = state.teachers.length;
+    const canCount = state.teachers.filter(t => !!t.can_add_questions).length;
+    $('#statTeachers').textContent = total;
+    $('#statCanAdd').textContent = canCount;
+  }
+
+  // ==== قائمة اختيار المدرسة ====
+  function renderSchoolSelect() {
+    const sel = $('#teacherSchoolSelect');
+    sel.innerHTML = '<option value="">— اختر المدرسة —</option>' +
+      state.schools.map(s => {
+        const code = s[SCHOOL_KEY];
+        return `<option value="${escapeHtml(code)}">${escapeHtml(s.school_name)} (${escapeHtml(code)})</option>`;
+      }).join('');
+
+    const filterSel = $('#teacherSchoolFilter');
+    const curr = filterSel.value;
+    filterSel.innerHTML = '<option value="">كل المدارس</option>' +
+      state.schools.map(s => {
+        const code = s[SCHOOL_KEY];
+        return `<option value="${escapeHtml(code)}">${escapeHtml(s.school_name)}</option>`;
+      }).join('');
+    if (curr) filterSel.value = curr;
+  }
+
+  // ==== إحصاءات الأسئلة ====
+  function renderQuestionsStats() {
+    $('#statMyQuestions').textContent = state.questionsCount.total;
+    $('#statMyActive').textContent = state.questionsCount.active;
+    $('#statMyMath').textContent = state.questionsCount.math;
+    $('#statMyScience').textContent = state.questionsCount.science;
+  }
+
+  // ==== إضافة مدرسة ====
+  async function addSchool() {
+    const national_code = $('#schoolIdInput').value.trim();
+    const school_name = $('#schoolNameInput').value.trim();
+    const gender = $('#schoolGenderInput').value.trim();
+    const school_type = $('#schoolTypeInput').value.trim();
+    if (!national_code || !school_name) { toast('الرقم الوطني والاسم مطلوبان', 'error'); return; }
+    if (!/^\d+$/.test(national_code)) { toast('الرقم الوطني يجب أن يكون أرقاماً فقط', 'error'); return; }
+    if (state.schools.some(s => String(s[SCHOOL_KEY]) === national_code)) {
+      toast('الرقم الوطني مستخدم مسبقاً', 'error'); return;
+    }
+    if (!state.directorateId) { toast('لا يمكن الحفظ: معرّف المديرية غير متوفر في الجلسة', 'error', 5000); return; }
+
+    const btn = $('#btnSaveSchool');
+    btn.disabled = true; btn.textContent = 'جارٍ الحفظ...';
+
+    try {
+      const payload = {
+        national_code: Number(national_code),
+        school_name,
+        directorate_id: Number(state.directorateId),
+        gender: gender || null,
+        school_type: school_type || null
+      };
+      const { error } = await DB.from('schools').insert([payload]);
+      if (error) throw error;
+      toast('تمت إضافة المدرسة بنجاح ✓', 'success');
+      closeModal('modalSchool');
+      $('#schoolIdInput').value = ''; $('#schoolNameInput').value = '';
+      $('#schoolGenderInput').value = ''; $('#schoolTypeInput').value = '';
+      await reloadAll();
+    } catch (e) {
+      console.error(e);
+      toast('فشل الحفظ: ' + (e.message || e), 'error', 5000);
+    } finally {
+      btn.disabled = false; btn.textContent = 'حفظ المدرسة';
+    }
+  }
+
+  // ==== إضافة معلم ====
+  async function addTeacher() {
+    const national_id = $('#teacherNidInput').value.trim();
+    const full_name = $('#teacherNameInput').value.trim();
+    const school_id = $('#teacherSchoolSelect').value;
+    const subject  = $('#teacherSpecInput').value.trim();
+    const can_add_questions = $('#teacherCanAddInput').checked;
+
+    if (!national_id || !full_name || !school_id) { toast('الرقم الوطني والاسم والمدرسة مطلوبة', 'error'); return; }
+    if (state.teachers.some(t => String(t.national_id) === national_id)) {
+      toast('الرقم الوطني مسجل مسبقاً', 'error'); return;
+    }
+
+    const btn = $('#btnSaveTeacher');
+    btn.disabled = true; btn.textContent = 'جارٍ الحفظ...';
+
+    try {
+      const { error } = await DB.from('teachers').insert([{
+        national_id,
+        full_name,
+        school_id: Number(school_id),
+        specialization: subject  || null,
+        can_add_questions
+      }]);
+      if (error) throw error;
+      toast('تمت إضافة المعلم بنجاح ✓', 'success');
+      closeModal('modalTeacher');
+      $('#teacherNidInput').value = ''; $('#teacherNameInput').value = '';
+      $('#teacherSpecInput').value = ''; $('#teacherCanAddInput').checked = false;
+      $('#teacherSchoolSelect').value = '';
+      await reloadAll();
+    } catch (e) {
+      console.error(e);
+      toast('فشل الحفظ: ' + (e.message || e), 'error', 5000);
+    } finally {
+      btn.disabled = false; btn.textContent = 'حفظ المعلم';
+    }
+  }
+
+  // ==== منح/سحب صلاحية ====
+  async function togglePermission(nationalId, currentCan) {
+    const newVal = !currentCan;
+    try {
+      const { error } = await DB
+        .from('teachers')
+        .update({ can_add_questions: newVal })
+        .eq('national_id', nationalId);
+      if (error) throw error;
+      toast(newVal ? 'تم منح الصلاحية ✓' : 'تم سحب الصلاحية ✓', 'success');
+      await loadTeachers();
+      renderTeachers();
+      renderSchools($('#schoolSearch').value);
+    } catch (e) {
+      console.error(e);
+      toast('فشل التحديث: ' + (e.message || e), 'error');
+    }
+  }
+
+  // ==== إعادة تحميل الكل ====
+  async function reloadAll() {
+    try {
+      await loadSchools();
+      await loadTeachers();
+      renderSchoolSelect();
+      renderSchools($('#schoolSearch').value);
+      renderTeachers();
+      $('#statTeachersSchools').textContent = state.teachers.length;
+    } catch (e) {
+      console.error(e);
+      toast('خطأ في تحميل البيانات: ' + (e.message || e), 'error', 5000);
+    }
+  }
+
+  // ==== تشخيص ====
+  async function runDiagnostics() {
+    const lines = [];
+    lines.push('========== تشخيص ==========');
+    lines.push('Role: ' + state.role);
+    lines.push('directorateId: ' + state.directorateId + ' (type: ' + typeof state.directorateId + ')');
+    lines.push('schools in state: ' + state.schools.length);
+    lines.push('teachers in state: ' + state.teachers.length);
+
+    if (state.schools.length > 0) {
+      const s = state.schools[0];
+      lines.push('\n[نموذج مدرسة]');
+      lines.push('  national_code: ' + s.national_code + ' (' + typeof s.national_code + ')');
+      lines.push('  school_name: ' + s.school_name);
+      lines.push('  directorate_id: ' + s.directorate_id + ' (' + typeof s.directorate_id + ')');
+      lines.push('  gender: ' + s.gender);
+      lines.push('  school_type: ' + s.school_type);
+    }
+
+    if (state.teachers.length > 0) {
+      const t = state.teachers[0];
+      lines.push('\n[نموذج معلم]');
+      lines.push('  national_id: ' + t.national_id);
+      lines.push('  school_id: ' + t.school_id + ' (' + typeof t.school_id + ')');
+      lines.push('  full_name: ' + t.full_name);
+      lines.push('  can_add_questions: ' + t.can_add_questions);
+    }
+
+    const schoolCodes = new Set(state.schools.map(s => String(s.national_code)));
+    const teacherSchoolIds = new Set(state.teachers.map(t => String(t.school_id)));
+    const matched = [...teacherSchoolIds].filter(id => schoolCodes.has(id));
+    lines.push('\n[المطابقة]');
+    lines.push('  teacher school_ids مطابقة: ' + matched.length + ' / ' + teacherSchoolIds.size);
+
+    const { data: allT } = await DB.from('teachers').select('*').limit(3);
+    lines.push('\n[DB teachers — LIMIT 3]');
+    lines.push('  count: ' + (allT?.length ?? 0));
+    if (allT && allT.length > 0) {
+      lines.push('  first: ' + JSON.stringify({
+        national_id: allT[0].national_id,
+        school_id: allT[0].school_id,
+        school_id_type: typeof allT[0].school_id
+      }));
+    }
+
+    document.getElementById('diagBody').textContent = lines.join('\n');
+    openModal('modalDiag');
+  }
+
+  // ==== الأحداث ====
+  function bindEvents() {
+    // تبويبات
+    $$('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        $$('.tab').forEach(t => t.classList.remove('active'));
+        $$('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        $('#panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    $('#schoolSearch').addEventListener('input', (e) => renderSchools(e.target.value));
+    $('#teacherSearch').addEventListener('input', renderTeachers);
+    $('#teacherSchoolFilter').addEventListener('change', renderTeachers);
+
+    $('#btnAddSchool').addEventListener('click', () => {
+      $('#schoolIdInput').value = ''; $('#schoolNameInput').value = '';
+      $('#schoolGenderInput').value = ''; $('#schoolTypeInput').value = '';
+      openModal('modalSchool');
+    });
+    $('#btnAddTeacher').addEventListener('click', () => {
+      if (state.schools.length === 0) { toast('أضف مدرسة أولاً', 'info'); return; }
+      renderSchoolSelect();
+      openModal('modalTeacher');
+    });
+
+    $('#btnReloadSchools').addEventListener('click', async () => {
+      toast('جارٍ التحديث...', 'info', 1200);
+      await reloadAll();
+      toast('تم التحديث ✓', 'success');
+    });
+    $('#btnReloadTeachers').addEventListener('click', async () => {
+      toast('جارٍ التحديث...', 'info', 1200);
+      await reloadAll();
+      toast('تم التحديث ✓', 'success');
+    });
+
+    $('#btnDiagnose').addEventListener('click', runDiagnostics);
+    $('#btnSaveSchool').addEventListener('click', addSchool);
+    $('#btnSaveTeacher').addEventListener('click', addTeacher);
+
+    $$('[data-close-modal]').forEach(el => {
+      el.addEventListener('click', () => closeModal(el.dataset.closeModal));
+    });
+    $$('.modal-overlay').forEach(ov => {
+      ov.addEventListener('click', (e) => { if (e.target === ov) ov.classList.remove('open'); });
+    });
+
+    // ضغط "معلمو المدرسة"
+    $('#schoolsBody').addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-act="view-teachers"]');
+      if (!b) return;
+      const sid = b.dataset.schoolId;
+      console.log('👁️ view-teachers — school national_code:', sid);
+
+      $$('.tab').forEach(t => t.classList.remove('active'));
+      $$('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelector('.tab[data-tab="teachers"]').classList.add('active');
+      $('#panel-teachers').classList.add('active');
+
+      const sel = $('#teacherSchoolFilter');
+      if (!Array.from(sel.options).some(o => String(o.value) === String(sid))) {
+        const opt = document.createElement('option');
+        opt.value = sid;
+        opt.textContent = 'مدرسة ' + sid;
+        sel.appendChild(opt);
+      }
+      sel.value = sid;
+
+      const inState = state.teachers.filter(t => String(t.school_id) === String(sid));
+      console.log('  teachers in state:', inState.length);
+
+      if (inState.length === 0) {
+        console.log('  fetching from DB...');
+        const { data, error } = await DB.from('teachers').select('*').eq('school_id', Number(sid));
+        if (error) {
+          console.error('fetch error:', error);
+          toast('خطأ: ' + error.message, 'error');
+        } else if (data && data.length > 0) {
+          data.forEach(t => {
+            if (!state.teachers.find(x => String(x.national_id) === String(t.national_id))) {
+              state.teachers.push(t);
+            }
+          });
+          toast(`تم جلب ${data.length} معلم من قاعدة البيانات`, 'success');
+        } else {
+          toast('لا يوجد معلمون مسجلون لهذه المدرسة في قاعدة البيانات', 'info', 5000);
+        }
+      }
+
+      renderTeachers();
+      renderSchools($('#schoolSearch').value);
+    });
+
+    $('#teachersBody').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-act="toggle-perm"]');
+      if (!b) return;
+      togglePermission(b.dataset.nid, b.dataset.can === '1');
+    });
+
+    // فتح مدير الأسئلة
+    $('#btnOpenQuestionsManager').addEventListener('click', () => {
+      location.href = 'questions-manager.html';
+    });
+
+    // ✅ فتح التقارير
+    $('#btnOpenReports').addEventListener('click', () => {
+      location.href = 'report.html';
+    });
+  }
+
+  // ==== الإقلاع ====
+  async function boot() {
+    bindEvents();
+    renderHeader();
+
+    console.log('===== BOOT (supervisor) =====');
+    console.log('directorateId:', state.directorateId);
+    console.log('nationalId:', state.nationalId);
+
+    try {
+      await loadDirectorateName();
+      renderHeader();
+      await loadSchools();
+      await loadTeachers();
+      renderSchoolSelect();
+      renderSchools();
+      renderTeachers();
+      await loadQuestionsStats();
+      renderQuestionsStats();
+
+      if (state.schools.length === 0) {
+        toast('⚠️ لم تظهر أي مدرسة — اضغط "🔍 تشخيص"', 'info', 7000);
+      } else if (state.teachers.length === 0) {
+        toast('ℹ️ لا يوجد معلمون في هذه المدارس بعد', 'info', 5000);
+      } else {
+        toast(`✓ ${state.schools.length} مدرسة و${state.teachers.length} معلم`, 'success', 3500);
+      }
+    } catch (e) {
+      console.error('BOOT ERROR:', e);
+      toast('خطأ في التحميل: ' + (e.message || e), 'error', 6000);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
